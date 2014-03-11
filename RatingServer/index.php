@@ -6,4 +6,5 @@ $r = new Restler();
 $r->setSupportedFormats('JsonFormat', 'XmlFormat');
 $r->addAPIClass('Surveys', '');
 $r->addAPIClass('Items', '');
+$r->addApiClass('Images');
 $r->handle(); //serve the response

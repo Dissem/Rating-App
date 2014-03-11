@@ -20,17 +20,17 @@ class Surveys
 		$mysql->select_db($mysql_db);
 		$mysql->set_charset('utf8');
 
-	    $stmt = $mysql->prepare("select title from Survey where id=?");
+	    $stmt = $mysql->prepare("select title, description, image_url from Survey where id=?");
 	    $stmt->bind_param("s", $id);
 		$survey->surveyId = $id;
-	    $stmt->bind_result($survey->title);
+	    $stmt->bind_result($survey->title, $survey->description, $survey->imageUrl);
 	    $stmt->execute();
 	    $stmt->fetch();
 	    $stmt->close();
 
-	    $stmt = $mysql->prepare("select item_id, title, description, rating, votes from Item where survey_id=?");
+	    $stmt = $mysql->prepare("select item_id, title, description, image_url, rating, votes from Item where survey_id=?");
 		$stmt->bind_param("s", $id);
-	    $stmt->bind_result($itemId, $title, $description, $rating, $votes);
+	    $stmt->bind_result($itemId, $title, $description, $imageUrl, $rating, $votes);
 	    $stmt->execute();
 
 	    $items = array();
@@ -40,6 +40,7 @@ class Surveys
 	      $item->itemId = $itemId;
 	      $item->title = $title;
 	      $item->description = $description;
+	      $item->imageUrl = $imageUrl;
 	      $item->rating = $rating;
 	      $item->votes = $votes;
 	      $items[] = $item;
