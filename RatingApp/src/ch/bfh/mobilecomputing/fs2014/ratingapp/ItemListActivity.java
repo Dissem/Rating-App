@@ -27,7 +27,7 @@ public class ItemListActivity extends FragmentActivity implements
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
 	 * device.
 	 */
-	private boolean mTwoPane;
+	private boolean twoPane;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class ItemListActivity extends FragmentActivity implements
 			// large-screen layouts (res/values-large and
 			// res/values-sw600dp). If this view is present, then the
 			// activity should be in two-pane mode.
-			mTwoPane = true;
+			twoPane = true;
 
 			// In two-pane mode, list items should be given the
 			// 'activated' state when touched.
@@ -47,7 +47,14 @@ public class ItemListActivity extends FragmentActivity implements
 					R.id.item_list)).setActivateOnItemClick(true);
 		}
 
-		// TODO: If exposing deep links into your app, handle intents here.
+		// FIXME
+		// // Create the detail fragment and add it to the activity
+		// // using a fragment transaction.
+		// Bundle arguments = new Bundle();
+		// arguments.putString(ItemListFragment.ARG_SURVEY_ID, getIntent()
+		// .getStringExtra(ItemListFragment.ARG_SURVEY_ID));
+		// getFragmentManager().findFragmentById(R.id.item_list).setArguments(
+		// arguments);
 	}
 
 	/**
@@ -56,11 +63,13 @@ public class ItemListActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onItemSelected(Item item) {
-		if (mTwoPane) {
+		if (twoPane) {
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
+			arguments.putString(ItemDetailFragment.ARG_SURVEY_ID,
+					item.getSurveyId());
 			arguments.putInt(ItemDetailFragment.ARG_ITEM_ID, item.getId());
 			ItemDetailFragment fragment = new ItemDetailFragment();
 			fragment.setArguments(arguments);
@@ -71,6 +80,8 @@ public class ItemListActivity extends FragmentActivity implements
 			// In single-pane mode, simply start the detail activity
 			// for the selected item ID.
 			Intent detailIntent = new Intent(this, ItemDetailActivity.class);
+			detailIntent.putExtra(ItemDetailFragment.ARG_SURVEY_ID,
+					item.getSurveyId());
 			detailIntent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.getId());
 			startActivity(detailIntent);
 		}

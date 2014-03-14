@@ -18,7 +18,7 @@ public class SurveyRepository {
 		// use getInstance()
 	}
 
-	public void getSurvey(final String id,
+	public void requestSurvey(final String id,
 			final RepositoryCallback<Survey> callback) {
 		new Thread(new Runnable() {
 			@Override

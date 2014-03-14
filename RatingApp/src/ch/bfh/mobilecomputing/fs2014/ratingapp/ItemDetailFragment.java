@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
@@ -22,9 +23,10 @@ public class ItemDetailFragment extends Fragment {
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
 	 */
+	public static final String ARG_SURVEY_ID = "survey_id";
 	public static final String ARG_ITEM_ID = "item_id";
 
-	private String surveyId = "test"; // TODO
+	private String surveyId;
 	private int itemId;
 	private Item item;
 
@@ -38,7 +40,9 @@ public class ItemDetailFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		if (getArguments().containsKey(ARG_SURVEY_ID)) {
+			surveyId = getArguments().getString(ARG_SURVEY_ID);
+		}
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
 			itemId = getArguments().getInt(ARG_ITEM_ID);
 		}
@@ -54,7 +58,7 @@ public class ItemDetailFragment extends Fragment {
 			// Load the dummy content specified by the fragment
 			// arguments. In a real-world scenario, use a Loader
 			// to load content from a content provider.
-			SurveyRepository.getInstance().getSurvey(surveyId,
+			SurveyRepository.getInstance().requestSurvey(surveyId,
 					new RepositoryCallback<Survey>() {
 						@Override
 						public void onReceived(Survey entity) {
@@ -64,7 +68,9 @@ public class ItemDetailFragment extends Fragment {
 
 						@Override
 						public void onError(Exception e) {
-							// TODO Auto-generated method stub
+							Utils.showToast(getActivity(),
+									R.string.survey_load_error,
+									Toast.LENGTH_LONG);
 						}
 					});
 		}

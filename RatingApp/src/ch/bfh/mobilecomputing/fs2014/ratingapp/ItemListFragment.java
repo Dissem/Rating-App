@@ -6,6 +6,7 @@ import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.RepositoryCallback;
@@ -27,7 +28,9 @@ public class ItemListFragment extends ListFragment {
 	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
-	private String surveyId = "test"; // TODO
+	public static final String ARG_SURVEY_ID = "survey_id";
+
+	private String surveyId = "test"; // FIXME: remove this
 	private Survey survey;
 
 	/**
@@ -73,8 +76,11 @@ public class ItemListFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (getArguments() != null && getArguments().containsKey(ARG_SURVEY_ID)) {
+			surveyId = getArguments().getString(ARG_SURVEY_ID);
+		}
 
-		SurveyRepository.getInstance().getSurvey(surveyId,
+		SurveyRepository.getInstance().requestSurvey(surveyId,
 				new RepositoryCallback<Survey>() {
 					@Override
 					public void onReceived(Survey entity) {
@@ -87,7 +93,8 @@ public class ItemListFragment extends ListFragment {
 
 					@Override
 					public void onError(Exception e) {
-						// TODO Auto-generated method stub
+						Utils.showToast(getActivity(),
+								R.string.survey_load_error, Toast.LENGTH_LONG);
 					}
 				});
 	}

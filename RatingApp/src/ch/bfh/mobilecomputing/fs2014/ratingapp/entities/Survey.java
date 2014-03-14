@@ -84,6 +84,10 @@ public class Survey {
 			return id;
 		}
 
+		public String getSurveyId() {
+			return Survey.this.id;
+		}
+
 		public String getTitle() {
 			return title;
 		}
