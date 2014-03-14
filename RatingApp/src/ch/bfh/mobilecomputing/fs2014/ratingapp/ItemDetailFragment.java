@@ -7,11 +7,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
-import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 
 /**
  * A fragment representing a single Item detail screen. This fragment is either
@@ -63,6 +63,10 @@ public class ItemDetailFragment extends Fragment {
 		if (item != null) {
 			((TextView) rootView.findViewById(R.id.title)).setText(item
 					.getTitle());
+			Utils.setImage(((ImageView) rootView.findViewById(R.id.item_logo)),
+					item.getImage());
+			((TextView) rootView.findViewById(R.id.detail_text)).setText(item
+					.getDescription());
 		}
 
 		return rootView;
