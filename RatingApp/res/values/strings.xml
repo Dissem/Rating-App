@@ -3,5 +3,6 @@
 
     <string name="app_name">Rating App</string>
     <string name="title_item_detail">Item Detail</string>
+    <string name="image_load_error">Couldn\'t get image</string>
 
 </resources>

@@ -1,7 +1,5 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
-import org.json.JSONException;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,6 +10,7 @@ import android.widget.TextView;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.RepositoryCallback;
 
 /**
  * A fragment representing a single Item detail screen. This fragment is either
@@ -25,7 +24,8 @@ public class ItemDetailFragment extends Fragment {
 	 */
 	public static final String ARG_ITEM_ID = "item_id";
 
-	private Survey survey;
+	private String surveyId = "test"; // TODO
+	private int itemId;
 	private Item item;
 
 	/**
@@ -33,12 +33,6 @@ public class ItemDetailFragment extends Fragment {
 	 * fragment (e.g. upon screen orientation changes).
 	 */
 	public ItemDetailFragment() {
-		try {
-			survey = new SurveyRepository().getSurvey("test"); // FIXME
-		} catch (JSONException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override
@@ -46,29 +40,48 @@ public class ItemDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			// Load the dummy content specified by the fragment
-			// arguments. In a real-world scenario, use a Loader
-			// to load content from a content provider.
-			item = survey.getItem(getArguments().getInt(ARG_ITEM_ID));
+			itemId = getArguments().getInt(ARG_ITEM_ID);
 		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_item_detail,
+		final View rootView = inflater.inflate(R.layout.fragment_item_detail,
 				container, false);
 
-		// Show the dummy content as text in a TextView.
+		if (getArguments().containsKey(ARG_ITEM_ID)) {
+			// Load the dummy content specified by the fragment
+			// arguments. In a real-world scenario, use a Loader
+			// to load content from a content provider.
+			SurveyRepository.getInstance().getSurvey(surveyId,
+					new RepositoryCallback<Survey>() {
+						@Override
+						public void onReceived(Survey entity) {
+							item = entity.getItem(itemId);
+							showItem(rootView);
+						}
+
+						@Override
+						public void onError(Exception e) {
+							// TODO Auto-generated method stub
+						}
+					});
+		}
+
+		return rootView;
+	}
+
+	private void showItem(View rootView) {
 		if (item != null) {
 			((TextView) rootView.findViewById(R.id.title)).setText(item
 					.getTitle());
 			Utils.setImage(((ImageView) rootView.findViewById(R.id.item_logo)),
 					item.getImage());
-			((TextView) rootView.findViewById(R.id.detail_text)).setText(item
-					.getDescription());
+			if (item.getDescription() != null) {
+				((TextView) rootView.findViewById(R.id.detail_text))
+						.setText(item.getDescription());
+			}
 		}
-
-		return rootView;
 	}
 }

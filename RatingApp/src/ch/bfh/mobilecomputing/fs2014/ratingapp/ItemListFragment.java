@@ -1,16 +1,14 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
-import org.json.JSONException;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.RepositoryCallback;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 
 /**
@@ -29,6 +27,7 @@ public class ItemListFragment extends ListFragment {
 	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
+	private String surveyId = "test"; // TODO
 	private Survey survey;
 
 	/**
@@ -69,22 +68,28 @@ public class ItemListFragment extends ListFragment {
 	 * fragment (e.g. upon screen orientation changes).
 	 */
 	public ItemListFragment() {
-		try {
-			survey = new SurveyRepository().getSurvey("test");
-		} catch (JSONException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// TODO: replace with a real list adapter.
-		setListAdapter(new ArrayAdapter<Survey.Item>(getActivity(),
-				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, survey.getItems()));
+		SurveyRepository.getInstance().getSurvey(surveyId,
+				new RepositoryCallback<Survey>() {
+					@Override
+					public void onReceived(Survey entity) {
+						survey = entity;
+						setListAdapter(new ArrayAdapter<Survey.Item>(
+								getActivity(),
+								android.R.layout.simple_list_item_activated_1,
+								android.R.id.text1, entity.getItems()));
+					}
+
+					@Override
+					public void onError(Exception e) {
+						// TODO Auto-generated method stub
+					}
+				});
 	}
 
 	@Override
@@ -127,7 +132,8 @@ public class ItemListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(survey.getItems().get((int) id));
+		if (survey != null)
+			mCallbacks.onItemSelected(survey.getItems().get((int) id));
 	}
 
 	@Override
