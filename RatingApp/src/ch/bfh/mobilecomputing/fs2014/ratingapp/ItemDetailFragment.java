@@ -82,8 +82,11 @@ public class ItemDetailFragment extends Fragment {
 		if (item != null) {
 			((TextView) rootView.findViewById(R.id.title)).setText(item
 					.getTitle());
-			Utils.setImage(((ImageView) rootView.findViewById(R.id.item_logo)),
-					item.getImage());
+			if (item.getImage() != null) {
+				Utils.setImage(
+						((ImageView) rootView.findViewById(R.id.item_logo)),
+						item.getImage());
+			}
 			if (item.getDescription() != null) {
 				((TextView) rootView.findViewById(R.id.detail_text))
 						.setText(item.getDescription());

@@ -75,7 +75,8 @@ public class Survey {
 			id = itemData.getInt("itemId");
 			title = itemData.getString("title");
 			description = itemData.getString("description");
-			image = Uri.parse(itemData.getString("imageUrl"));
+			String imageUrl = itemData.getString("imageUrl");
+			image = (imageUrl == null ? null : Uri.parse(imageUrl));
 			rating = itemData.getDouble("rating");
 			votes = itemData.getInt("votes");
 		}
