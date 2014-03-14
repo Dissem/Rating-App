@@ -1,5 +1,7 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
+import org.json.JSONException;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -7,7 +9,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import ch.bfh.mobilecomputing.fs2014.ratingapp.dummy.DummyContent;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 
 /**
  * A list fragment representing a list of Items. This fragment also supports
@@ -19,12 +23,13 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.dummy.DummyContent;
  * interface.
  */
 public class ItemListFragment extends ListFragment {
-
 	/**
 	 * The serialization (saved instance state) Bundle key representing the
 	 * activated item position. Only used on tablets.
 	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
+
+	private Survey survey;
 
 	/**
 	 * The fragment's current callback object, which is notified of list item
@@ -46,7 +51,7 @@ public class ItemListFragment extends ListFragment {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(String id);
+		public void onItemSelected(Item id);
 	}
 
 	/**
@@ -55,7 +60,7 @@ public class ItemListFragment extends ListFragment {
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
-		public void onItemSelected(String id) {
+		public void onItemSelected(Item id) {
 		}
 	};
 
@@ -64,6 +69,12 @@ public class ItemListFragment extends ListFragment {
 	 * fragment (e.g. upon screen orientation changes).
 	 */
 	public ItemListFragment() {
+		try {
+			survey = new SurveyRepository().getSurvey("test");
+		} catch (JSONException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -71,9 +82,9 @@ public class ItemListFragment extends ListFragment {
 		super.onCreate(savedInstanceState);
 
 		// TODO: replace with a real list adapter.
-		setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
+		setListAdapter(new ArrayAdapter<Survey.Item>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, DummyContent.ITEMS));
+				android.R.id.text1, survey.getItems()));
 	}
 
 	@Override
@@ -116,7 +127,7 @@ public class ItemListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+		mCallbacks.onItemSelected(survey.getItems().get((int) id));
 	}
 
 	@Override

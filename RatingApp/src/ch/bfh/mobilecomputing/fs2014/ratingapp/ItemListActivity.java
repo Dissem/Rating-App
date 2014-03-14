@@ -1,5 +1,6 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -54,13 +55,13 @@ public class ItemListActivity extends FragmentActivity implements
 	 * the item with the given ID was selected.
 	 */
 	@Override
-	public void onItemSelected(String id) {
+	public void onItemSelected(Item item) {
 		if (mTwoPane) {
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putString(ItemDetailFragment.ARG_ITEM_ID, id);
+			arguments.putInt(ItemDetailFragment.ARG_ITEM_ID, item.getId());
 			ItemDetailFragment fragment = new ItemDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -70,7 +71,7 @@ public class ItemListActivity extends FragmentActivity implements
 			// In single-pane mode, simply start the detail activity
 			// for the selected item ID.
 			Intent detailIntent = new Intent(this, ItemDetailActivity.class);
-			detailIntent.putExtra(ItemDetailFragment.ARG_ITEM_ID, id);
+			detailIntent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.getId());
 			startActivity(detailIntent);
 		}
 	}
