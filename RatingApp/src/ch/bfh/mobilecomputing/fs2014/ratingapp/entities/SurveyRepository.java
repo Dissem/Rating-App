@@ -6,16 +6,28 @@ import java.net.URL;
 
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Handler;
 import android.os.Looper;
 
 public class SurveyRepository {
-	private static SurveyRepository INSTANCE = new SurveyRepository();
+	private static SurveyRepository INSTANCE;
 
 	private static String RATING_API_URI = "http://ratingapi.dissem.ch";
 
-	private SurveyRepository() {
-		// use getInstance()
+	private static SharedPreferences sharedPref;
+	private static String surveyId;
+
+	private SurveyRepository(Activity activity) {
+		sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+	}
+
+	public static synchronized void init(Activity activity) {
+		if (INSTANCE == null)
+			INSTANCE = new SurveyRepository(activity);
 	}
 
 	public void requestSurvey(final String id,
@@ -55,7 +67,21 @@ public class SurveyRepository {
 		}).start();
 	}
 
-	public static interface RepositoryCallback<E> {
+	public String getSurveyId() {
+		if (surveyId == null) {
+			surveyId = sharedPref.getString("surveyId", null);
+		}
+		return surveyId;
+	}
+
+	public void setSurveyId(String surveyId) {
+		Editor editor = sharedPref.edit();
+		editor.putString("surveyId", surveyId);
+		editor.commit();
+		SurveyRepository.surveyId = surveyId;
+	}
+
+	public interface RepositoryCallback<E> {
 		public void onReceived(E entity);
 
 		public void onError(Exception e);

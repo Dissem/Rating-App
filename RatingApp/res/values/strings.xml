@@ -5,5 +5,8 @@
     <string name="title_item_detail">Item Detail</string>
     <string name="image_load_error">Couldn\'t get image</string>
     <string name="survey_load_error">Couldn\'t load survey</string>
+    <string name="scan_code">Scan Code</string>
+    <string name="survey_code">survey code</string>
+    <string name="start_survey">Start Survey</string>
 
 </resources>

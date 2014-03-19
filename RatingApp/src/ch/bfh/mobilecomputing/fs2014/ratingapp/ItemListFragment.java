@@ -28,9 +28,9 @@ public class ItemListFragment extends ListFragment {
 	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
-	public static final String ARG_SURVEY_ID = "survey_id";
+	private final SurveyRepository surveyRepo = SurveyRepository.getInstance();
 
-	private String surveyId = "test"; // FIXME: remove this
+	private String surveyId;
 	private Survey survey;
 
 	/**
@@ -76,27 +76,24 @@ public class ItemListFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (getArguments() != null && getArguments().containsKey(ARG_SURVEY_ID)) {
-			surveyId = getArguments().getString(ARG_SURVEY_ID);
-		}
 
-		SurveyRepository.getInstance().requestSurvey(surveyId,
-				new RepositoryCallback<Survey>() {
-					@Override
-					public void onReceived(Survey entity) {
-						survey = entity;
-						setListAdapter(new ArrayAdapter<Survey.Item>(
-								getActivity(),
-								android.R.layout.simple_list_item_activated_1,
-								android.R.id.text1, entity.getItems()));
-					}
+		surveyId = surveyRepo.getSurveyId();
 
-					@Override
-					public void onError(Exception e) {
-						Utils.showToast(getActivity(),
-								R.string.survey_load_error, Toast.LENGTH_LONG);
-					}
-				});
+		surveyRepo.requestSurvey(surveyId, new RepositoryCallback<Survey>() {
+			@Override
+			public void onReceived(Survey entity) {
+				survey = entity;
+				setListAdapter(new ArrayAdapter<Survey.Item>(getActivity(),
+						android.R.layout.simple_list_item_activated_1,
+						android.R.id.text1, entity.getItems()));
+			}
+
+			@Override
+			public void onError(Exception e) {
+				Utils.showToast(getActivity(), R.string.survey_load_error,
+						Toast.LENGTH_LONG);
+			}
+		});
 	}
 
 	@Override
