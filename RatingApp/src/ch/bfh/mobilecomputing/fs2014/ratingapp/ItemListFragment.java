@@ -85,9 +85,7 @@ public class ItemListFragment extends ListFragment {
 					@Override
 					public void onReceived(Survey entity) {
 						survey = entity;
-						setListAdapter(new ArrayAdapter<Survey.Item>(
-								getActivity(),
-								android.R.layout.simple_list_item_activated_1,
+						setListAdapter(new ProjectAdapter(getActivity(),
 								android.R.id.text1, entity.getItems()));
 					}
 
