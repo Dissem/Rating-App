@@ -3,14 +3,15 @@ package ch.bfh.mobilecomputing.fs2014.ratingapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
-import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.RepositoryCallback;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.RepositoryCallback;
 
 /**
  * A list fragment representing a list of Items. This fragment also supports
@@ -83,6 +84,12 @@ public class ItemListFragment extends ListFragment {
 			@Override
 			public void onReceived(Survey entity) {
 				survey = entity;
+				ListView listView = getListView();
+				LayoutInflater inflater = getLayoutInflater(null);
+				
+				ViewGroup header = (ViewGroup) inflater.inflate(R.layout.list_header, listView, false);
+				listView.addHeaderView(header, entity.getTitle(), false);
+				
 				setListAdapter(new ItemAdapter(getActivity(),
 						android.R.id.text1, entity.getItems()));
 			}
