@@ -12,9 +12,9 @@ import android.widget.TextView;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 
-public class ProjectAdapter extends ArrayAdapter<Survey.Item> {
+public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 
-	public ProjectAdapter(Context context, int resource, List<Survey.Item> projects) {
+	public ItemAdapter(Context context, int resource, List<Survey.Item> projects) {
 		super(context, resource, projects);
 	}
 
@@ -24,7 +24,7 @@ public class ProjectAdapter extends ArrayAdapter<Survey.Item> {
 		
 		if (row == null) {
 			LayoutInflater inflater = LayoutInflater.from(getContext());
-			row = inflater.inflate(R.layout.project_row, null);
+			row = inflater.inflate(R.layout.item_row, null);
 		}
 		
 		Survey.Item item = getItem(position);
