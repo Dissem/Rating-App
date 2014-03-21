@@ -21,9 +21,8 @@
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
 
-    <fragment
+    <FrameLayout
         android:id="@+id/item_list"
-        android:name="ch.bfh.mobilecomputing.fs2014.ratingapp.ItemListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
