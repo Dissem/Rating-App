@@ -18,6 +18,10 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 
 public class MainActivity extends FragmentActivity implements
 		ItemListFragment.Callbacks {
+	private static final int ENTER_CODE_POSITION = 0;
+	private static final int SURVEY_POSITION = 1;
+
+	private int lastPosition = -1;
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle drawerToggle;
 	private ListView drawerList;
@@ -46,10 +50,13 @@ public class MainActivity extends FragmentActivity implements
 		drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		String surveyId = surveyRepo.getSurveyId();
-		if (surveyId == null)
+		if (surveyId == null) {
 			showEnterCode(false);
-		else
+			lastPosition = ENTER_CODE_POSITION;
+		} else {
 			showSurvey(false);
+			lastPosition = SURVEY_POSITION;
+		}
 
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
@@ -112,18 +119,23 @@ public class MainActivity extends FragmentActivity implements
 
 	/** Swaps fragments in the main content view */
 	private void selectItem(int position) {
-		switch (position) {
-		case 0:
-			showEnterCode(true);
-			break;
-		case 1:
-			showSurvey(true);
-			break;
-		}
+		if (lastPosition != position) {
+			lastPosition = position;
 
-		// Highlight the selected item, update the title, and close the drawer
-		drawerList.setItemChecked(position, true);
-		// setTitle(mPlanetTitles[position]);
+			switch (position) {
+			case ENTER_CODE_POSITION:
+				showEnterCode(true);
+				break;
+			case SURVEY_POSITION:
+				showSurvey(true);
+				break;
+			}
+
+			// Highlight the selected item, update the title,
+			// and close the drawer
+			drawerList.setItemChecked(position, true);
+			// setTitle(mPlanetTitles[position]);
+		}
 		drawerLayout.closeDrawer(drawerList);
 	}
 
