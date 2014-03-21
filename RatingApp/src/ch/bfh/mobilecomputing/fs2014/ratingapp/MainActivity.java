@@ -156,6 +156,7 @@ public class MainActivity extends FragmentActivity implements
 			tx.addToBackStack("detail");
 		tx.commit();
 	}
+	
 
 	@Override
 	public void setTitle(CharSequence title) {

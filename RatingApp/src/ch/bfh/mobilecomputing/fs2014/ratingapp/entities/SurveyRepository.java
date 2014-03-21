@@ -4,25 +4,35 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings.Secure;
 
 public class SurveyRepository {
 	private static SurveyRepository INSTANCE;
 
 	private static String RATING_API_URI = "http://ratingapi.dissem.ch";
 
+	private static ContentResolver contentResolver;
 	private static SharedPreferences sharedPref;
 	private static String surveyId;
 
 	private SurveyRepository(Activity activity) {
 		sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+		contentResolver = activity.getContentResolver();
 	}
 
 	public static synchronized void init(Activity activity) {
@@ -79,6 +89,49 @@ public class SurveyRepository {
 		editor.putString("surveyId", surveyId);
 		editor.commit();
 		SurveyRepository.surveyId = surveyId;
+	}
+
+	public void writeItemRating(final String surveyId, final int itemId, final double rating) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+
+					URL url = new URL(RATING_API_URI + "/surveys/" + surveyId
+							+ "/items/" + itemId + "/rate");
+					
+					JSONObject data = new JSONObject();
+
+					// Todo Rating dynamically
+					JSONObject item = new JSONObject();
+					item.put("rating", rating);
+					item.put("userId", getAndroidId());
+
+					data.put("data", item);
+					System.out.println(data.toString());
+
+					DefaultHttpClient httpclient = new DefaultHttpClient();
+					HttpPost httpPost = new HttpPost(url.toString());
+					StringEntity jsonEntity = new
+					StringEntity(data.toString());
+					httpPost.setEntity(jsonEntity);
+					
+					httpPost.setHeader("Accept", "application/json");
+					httpPost.setHeader("Content-type", "application/json");
+					
+					ResponseHandler responseHandler = new BasicResponseHandler(); 
+					httpclient.execute(httpPost,
+					responseHandler);
+					
+					System.out.println("responseItemRating called");
+				} catch (final Exception e) {
+				}
+			}
+		}).start();
+	}
+
+	public String getAndroidId() {
+		return Secure.getString(contentResolver, Secure.ANDROID_ID);
 	}
 
 	public interface RepositoryCallback<E> {

@@ -1,11 +1,17 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
+import java.lang.reflect.Method;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
@@ -19,6 +25,7 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.Reposit
  * {@link ItemDetailActivity} on handsets.
  */
 public class ItemDetailFragment extends Fragment {
+	
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
@@ -29,6 +36,8 @@ public class ItemDetailFragment extends Fragment {
 	private String surveyId;
 	private int itemId;
 	private Item item;
+	
+	private RatingBar ratingBar;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -74,9 +83,32 @@ public class ItemDetailFragment extends Fragment {
 						}
 					});
 		}
-
+		
+		Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
+		rateButton.setOnClickListener(rateHandler);
+		
+		ratingBar = (RatingBar) rootView.findViewById(R.id.rating_bar);
+		 
 		return rootView;
 	}
+	
+	/**
+	 * OnClickListener which is called when the "Rate Item"-Button was clicked
+	 */
+	View.OnClickListener rateHandler = new View.OnClickListener() {
+	    public void onClick(View v) {
+	    	
+	    	final double rating = (double)ratingBar.getRating();
+	    	if (rating == 0) {
+	    		Utils.showToast(getActivity(),
+						R.string.rate_zero_error,
+						Toast.LENGTH_LONG);
+	    	} else {
+	    		SurveyRepository.getInstance().writeItemRating(surveyId, itemId, rating);
+	    	}
+			
+	    }
+	  };
 
 	private void showItem(View rootView) {
 		if (item != null) {
@@ -93,4 +125,7 @@ public class ItemDetailFragment extends Fragment {
 			}
 		}
 	}
+	
+	
+	
 }
