@@ -28,7 +28,7 @@
                 android:id="@+id/txtTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/fontSize_headline"
+                android:textSize="@dimen/fontSize_itemTitle"
                 android:textStyle="bold" />
 
             <TextView
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#777"
-                android:textSize="@dimen/fontSize_team" />
+                android:textSize="@dimen/fontSize_desc" />
 
             <RatingBar
                 android:id="@+id/ratingBar"
