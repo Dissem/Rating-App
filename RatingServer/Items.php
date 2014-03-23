@@ -69,7 +69,7 @@ class Items
 			throw new RestException(400, 'User already voted');
         }
 
-	    $stmt = $mysql->prepare("update Item set rating=(((votes*rating)+?)/(rating+1)), votes=(votes+1) where survey_id=? and item_id=?");
+	    $stmt = $mysql->prepare("update Item set rating=(((votes*rating)+?)/(votes+1)), votes=(votes+1) where survey_id=? and item_id=?");
 	    $stmt->bind_param("dsi", $data['rating'], $surveyId, $itemId);
 	    $stmt->execute();
 	    $stmt->close();
