@@ -6,6 +6,8 @@
     <string name="image_load_error">Couldn\'t get image</string>
     <string name="survey_load_error">Couldn\'t load survey</string>
     <string name="scan_code">Scan Code</string>
+    <string name="enter_code">Enter Code</string>
+    <string name="survey">Survey</string>
     <string name="survey_code">survey code</string>
     <string name="start_survey">Start Survey</string>
     <string name="drawer_open">Open navigation drawer</string>

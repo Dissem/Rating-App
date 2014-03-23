@@ -27,7 +27,7 @@ public class MainActivity extends FragmentActivity implements
 	private ListView drawerList;
 	private ItemListAndDetailFragment itemListAndDetailFragment;
 	private SurveyRepository surveyRepo;
-	private CharSequence title;
+	private String title;
 	private CharSequence drawerTitle;
 
 	@Override
@@ -41,11 +41,13 @@ public class MainActivity extends FragmentActivity implements
 
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		drawerList = (ListView) findViewById(R.id.left_drawer);
+		drawerTitle = getString(R.string.app_name);
 
 		// Set the adapter for the list view
 		drawerList.setAdapter(new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, new String[] {
-						"Enter Code", "Survey" }));
+						getString(R.string.enter_code),
+						getString(R.string.survey) }));
 		// Set the list's click listener
 		drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
@@ -134,33 +136,35 @@ public class MainActivity extends FragmentActivity implements
 			// Highlight the selected item, update the title,
 			// and close the drawer
 			drawerList.setItemChecked(position, true);
-			// setTitle(mPlanetTitles[position]);
 		}
 		drawerLayout.closeDrawer(drawerList);
 	}
 
 	private void showEnterCode(boolean addToStack) {
+		setTitle(getString(R.string.app_name) + " - "
+				+ getString(R.string.enter_code));
 		Fragment fragment = new EnterCodeFragment();
 		FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
 		tx.replace(R.id.content_frame, fragment);
 		if (addToStack)
-			tx.addToBackStack("enter code");
+			tx.addToBackStack(title);
 		tx.commit();
 	}
 
 	private void showSurvey(boolean addToStack) {
+		setTitle(getString(R.string.app_name) + " - "
+				+ getString(R.string.survey));
 		itemListAndDetailFragment = new ItemListAndDetailFragment();
 		FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
 		tx.replace(R.id.content_frame, itemListAndDetailFragment);
 		if (addToStack)
-			tx.addToBackStack("detail");
+			tx.addToBackStack(title);
 		tx.commit();
 	}
-	
 
 	@Override
 	public void setTitle(CharSequence title) {
-		// mTitle = title;
+		this.title = String.valueOf(title);
 		getActionBar().setTitle(title);
 	}
 

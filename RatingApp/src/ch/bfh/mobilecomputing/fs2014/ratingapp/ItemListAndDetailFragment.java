@@ -1,8 +1,8 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,21 +51,16 @@ public class ItemListAndDetailFragment extends Fragment implements
 			Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.fragment_item_list,
 				container, false);
-		getFragmentManager().beginTransaction()
-				.add(R.id.item_list, new ItemListFragment()).commit();
+		ItemListFragment fragment = new ItemListFragment();
+		getFragmentManager().beginTransaction().add(R.id.item_list, fragment)
+				.commit();
 
-		if (rootView.findViewById(R.id.item_detail_container) != null) {
-			// The detail container view will be present only in the
-			// large-screen layouts (res/values-large and
-			// res/values-sw600dp). If this view is present, then the
-			// activity should be in two-pane mode.
-			twoPane = true;
+		// The detail container view will be present only in the
+		// large-screen layouts (res/values-large and
+		// res/values-sw600dp). If this view is present, then the
+		// activity should be in two-pane mode.
+		twoPane = (rootView.findViewById(R.id.item_detail_container) != null);
 
-			// In two-pane mode, list items should be given the
-			// 'activated' state when touched.
-			((ItemListFragment) getFragmentManager().findFragmentById(
-					R.id.item_list)).setActivateOnItemClick(true);
-		}
 		return rootView;
 	}
 
@@ -82,19 +77,22 @@ public class ItemListAndDetailFragment extends Fragment implements
 		ItemDetailFragment fragment = new ItemDetailFragment();
 		fragment.setArguments(arguments);
 
+		int container;
 		if (twoPane) {
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
-			getFragmentManager().beginTransaction()
-					.replace(R.id.item_detail_container, fragment)
-					.addToBackStack("detail").commit();
+			container = R.id.item_detail_container;
 		} else {
 			// In single-pane mode, simply start the detail activity
 			// for the selected item ID.
-			getFragmentManager().beginTransaction()
-					.replace(R.id.content_frame, fragment)
-					.addToBackStack("detail").commit();
+			container = R.id.content_frame;
+		}
+		if (getFragmentManager() != null) {
+			FragmentTransaction tx = getFragmentManager().beginTransaction();
+			tx.replace(container, fragment);
+			tx.addToBackStack("detail");
+			tx.commit();
 		}
 	}
 }

@@ -86,10 +86,11 @@ public class ItemListFragment extends ListFragment {
 				survey = entity;
 				ListView listView = getListView();
 				LayoutInflater inflater = getLayoutInflater(null);
-				
-				ViewGroup header = (ViewGroup) inflater.inflate(R.layout.list_header, listView, false);
+
+				ViewGroup header = (ViewGroup) inflater.inflate(
+						R.layout.list_header, listView, false);
 				listView.addHeaderView(header, entity.getTitle(), false);
-				
+
 				setListAdapter(new ItemAdapter(getActivity(),
 						android.R.id.text1, entity.getItems()));
 			}
@@ -105,6 +106,8 @@ public class ItemListFragment extends ListFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+		setActivateOnItemClick(true);
 
 		// Restore the previously serialized activated item position.
 		if (savedInstanceState != null
