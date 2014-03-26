@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Rating Client</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <style>
+  body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+  }
+  </style>
+  <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <script src="js/vendor/modernizr-2.7.1.min.js"></script>
+</head>
+<body>
+  <!--[if lt IE 7]>
+  <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Rating Client</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <form class="navbar-form navbar-right" role="form">
+          <div class="form-group">
+            <input type="text" placeholder="Email" class="form-control">
+          </div>
+          <div class="form-group">
+            <input type="password" placeholder="Password" class="form-control">
+          </div>
+          <!-- <button type="submit" class="btn btn-success">Sign in</button> -->
+        </form>
+      </div><!--/.navbar-collapse -->
+    </div>
+  </div>
+
+  <div class="container">
+    <form class="form-horizontal" role="form" id="form-survey">
+      <div id="survey" class="row">
+        <h2>Survey</h2>
+        <div class="form-group">
+          <label for="survey-id" class="col-sm-2 control-label">Id</label>
+          <div class="col-sm-10">
+            <input type="text"
+                   name="id"
+                   required
+                   pattern="[a-zA-Z0-1]+"
+                   id="survey-id"
+                   class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="survey-title" class="col-sm-2 control-label">Title</label>
+          <div class="col-sm-10">
+            <input type="text"
+                   name="title"
+                   required
+                   id="survey-title"
+                   class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="survey-description" class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea name="description" id="survey-description" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="survey-image" class="col-sm-2 control-label">Image</label>
+          <div class="col-sm-10">
+            <input type="file" name="image" id="survey-image" class="form-control">
+          </div>
+        </div>
+        <hr>
+      </div>
+
+      <div id="configured-items">
+      </div>
+
+      <div id="item" class="row">
+        <h2>Item</h2>
+        <div class="form-group">
+          <label for="item-title" class="col-sm-2 control-label">Title</label>
+          <div class="col-sm-10">
+            <input type="text"
+                   name="title"
+                   required
+                   id="item-title"
+                   class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="item-description" class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea name="description" id="item-description" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="item-image" class="col-sm-2 control-label">Image</label>
+          <div class="col-sm-10">
+            <input type="file" name="image" id="item-image" class="form-control">
+          </div>
+        </div>
+        <hr>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-10">
+          <div class="btn-group">
+              <button id="btnAddItem" type="submit" class="btn btn-default">Add Item</button>
+              <button id="btnCreateSurvey" type="submit" class="btn btn-primary">Create Survey</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <footer class="row">
+      <hr>
+      <p>&copy; Christian Meyer 2014</p>
+    </footer>
+  </div> <!-- /container --> 
+  <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="js/vendor/jquery-2.1.0.min.js"></script>')</script>-->
+  <script src="js/vendor/jquery-2.1.0.min.js"></script>
+
+  <script src="js/vendor/bootstrap.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
