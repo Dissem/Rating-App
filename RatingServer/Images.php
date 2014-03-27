@@ -26,4 +26,27 @@ class Images
 
 		echo($data);
 	}
+
+ 	/**
+     * @access protected
+     * @class  AccessControl {@requires admin}
+     */
+	function post($request_data = NULL) {
+		include 'config.php';
+
+		$image = $request_data['fileUpload'];
+
+		$name = uniqid();
+		$data = fopen($image['tmp_name'], 'rb');
+
+		$engine = 'mysql';
+		
+		$dns = $engine.':dbname='.$mysql_db.';host='.$mysql_server;
+		$db = new PDO( $dns, $mysql_user, $mysql_password );
+		
+		$stmt = $db->prepare("insert into Image (name, type, data) values (?, ?, ?)");
+		$stmt->execute(array($name, $image['type'], $data));
+
+		return array("name" => $name);
+	}
 }

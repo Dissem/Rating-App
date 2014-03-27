@@ -1,6 +1,7 @@
 CREATE TABLE `Survey` (
   `id` varchar(20) NOT NULL,
   `title` text NOT NULL,
+  `subtitle` text,
   `description` text,
   `image_url` varchar(255),
   PRIMARY KEY (`id`)
@@ -10,6 +11,7 @@ CREATE TABLE `Item` (
   `survey_id` varchar(20) NOT NULL,
   `item_id` int(11) NOT NULL,
   `title` text,
+  `subtitle` text,
   `description` text,
   `image_url` varchar(255),
   `rating` decimal(4,3) NOT NULL DEFAULT '0.000',
