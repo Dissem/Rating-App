@@ -18,9 +18,9 @@ class Items
 		$mysql->select_db($mysql_db);
 		$mysql->set_charset('utf8');
 
-	    $stmt = $mysql->prepare("select title, description, image_url, rating, votes from Item where survey_id=? and item_id=?");
+	    $stmt = $mysql->prepare("select title, subtitle, description, image_url, rating, votes from Item where survey_id=? and item_id=?");
 		$stmt->bind_param("si", $surveyId, $itemId);
-	    $stmt->bind_result($title, $description, $imageUrl, $rating, $votes);
+	    $stmt->bind_result($title, $subtitle, $description, $imageUrl, $rating, $votes);
 	    $stmt->execute();
 
 		if (!$stmt->fetch()) {
@@ -30,6 +30,7 @@ class Items
 		$item->surveyId = $surveyId;
 		$item->itemId = $itemId;
 		$item->title = $title;
+		$item->subtitle = $subtitle;
 		$item->description = $description;
 		$item->imageUrl = $imageUrl;
 		$item->rating = $rating;
