@@ -59,4 +59,11 @@
         android:onClick="saveRating"
         android:text="@string/rate_item" />
 
+    <TextView
+        android:id="@+id/rating_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rating_bar"
+        android:layout_alignLeft="@+id/rating_bar" />
+
 </RelativeLayout>

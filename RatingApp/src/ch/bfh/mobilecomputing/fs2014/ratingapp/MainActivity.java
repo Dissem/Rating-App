@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.DatabaseConnector;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 
 public class MainActivity extends FragmentActivity implements
@@ -36,6 +37,7 @@ public class MainActivity extends FragmentActivity implements
 
 		SurveyRepository.init(this);
 		surveyRepo = SurveyRepository.getInstance();
+		DatabaseConnector.init(this.getBaseContext());
 
 		setContentView(R.layout.activity_main);
 

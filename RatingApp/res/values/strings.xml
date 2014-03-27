@@ -13,6 +13,8 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="rate_item">Rate item</string>
-    <string name="rate_zero_error">Please give a rate.</string>
-
+    <string name="item_rate_zero_error">Please give a rate.</string>
+    <string name="item_rate_error">Couldn\'t rate item</string>
+    <string name="item_rate_success">Item successfully rated</string>
+    <string name="text_already_rated">You have already rated this item. \nAverage Rating: </string>
 </resources>
