@@ -2,14 +2,18 @@ package ch.bfh.mobilecomputing.fs2014.ratingapp.entities;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ * Helper-Class which creates, if not exists, the SQLite-DB including the rating table
+ * and have all information about the SQLite-DB and their including tables.
+ */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static final int DATABASE_VERSION = 1;
-    private String ratingTableName = "rating";
     private static final String DATABASE_NAME = "RatingApp";
+    
+    private String ratingTableName = "rating";
     private String columnSurveyId = "surveyId";
 	private String columnItemId = "itemId";
 
@@ -25,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return columnItemId;
 	}
     
-	public  DatabaseHelper(Context context) {
+	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
@@ -36,8 +40,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO Auto-generated method stub
-		
-	}
-	
+	}	
 }

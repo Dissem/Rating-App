@@ -6,6 +6,12 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+/**
+ * Singleton.
+ * Connect to the SQLite-DB and execute SQL-Queries again the database. 
+ * Have methods to add a rating (SQL Insert) and
+ * check if the phone has rate an item (SQL SELECT COUNT).
+ */
 public class DatabaseConnector {
 	private static DatabaseConnector INSTANCE;
 	private SQLiteDatabase database;

@@ -1,13 +1,7 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
-import java.lang.reflect.Method;
-
-import org.apache.http.HttpResponse;
-
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +36,7 @@ public class ItemDetailFragment extends Fragment {
 	private Item item;
 	
 	private RatingBar ratingBar;
+	private View rootView;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -64,38 +59,17 @@ public class ItemDetailFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		final View rootView = inflater.inflate(R.layout.fragment_item_detail,
+		rootView = inflater.inflate(R.layout.fragment_item_detail,
 				container, false);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			// Load the dummy content specified by the fragment
-			// arguments. In a real-world scenario, use a Loader
-			// to load content from a content provider.
+			// Load the survey and their items via REST-Service
 			SurveyRepository.getInstance().requestSurvey(surveyId,
 					new RepositoryCallback<Survey>() {
 						@Override
 						public void onReceived(Survey entity) {
 							item = entity.getItem(itemId);
-							showItem(rootView);
-							
-							ratingBar = (RatingBar) rootView.findViewById(R.id.rating_bar);
-							
-							Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
-							rateButton.setOnClickListener(rateHandler);
-							
-							TextView ratingText = (TextView) rootView.findViewById(R.id.rating_text);
-							
-							//If User has rated the item
-							Rating rating = new Rating(surveyId,itemId);
-							DatabaseConnector.getInstance().open();
-							if (DatabaseConnector.getInstance().isRatingExist(rating)){
-								rateButton.setVisibility(View.GONE);
-								String averageRating = " "+item.getRating();
-								ratingText.setText(getString(R.string.text_already_rated) + averageRating);
-								ratingBar.setEnabled(false);
-								ratingBar.setRating((float)item.getRating());
-							}
-							DatabaseConnector.getInstance().close();
+							showItem();
 						}
 
 						@Override
@@ -106,31 +80,34 @@ public class ItemDetailFragment extends Fragment {
 						}
 					});
 		}
-
 		return rootView;
 	}
 	
 	/**
-	 * OnClickListener which is called when the "Rate Item"-Button was clicked
+	 * OnClickListener which is called when the "Rate"-Button was clicked
 	 */
 	View.OnClickListener rateHandler = new View.OnClickListener() {
-	    public void onClick(View v) {
-	    	
+	    public void onClick(final View v) {
 	    	final double rating = (double)ratingBar.getRating();
+	    	
 	    	if (rating == 0) {
 	    		Utils.showToast(getActivity(),
 						R.string.item_rate_zero_error,
 						Toast.LENGTH_LONG);
 	    	} else {
-	    		SurveyRepository.getInstance().writeItemRating(v.getContext(), surveyId, itemId, rating, new RepositoryCallback<HttpResponse>() {
+	    		//Write the item rating via. REST-Service
+	    		SurveyRepository.getInstance().writeItemRating(v.getContext(), surveyId, itemId, rating, new RepositoryCallback<String>() {
 					@Override
-					public void onReceived(HttpResponse response) {
+					public void onReceived(String response) {
+						//Calculate new Average Rating
+						double oldRating = item.getRating();
+						double newRating = Math.round(((oldRating * item.getVotes()) + rating) /(item.getVotes() + 1)*1000)/1000.0;
 						
+						displayRatingElementsAfterRating(newRating);
 						Utils.showToast(getActivity(),
 								R.string.item_rate_success,
 								Toast.LENGTH_LONG);
 					}
-
 					@Override
 					public void onError(Exception e) {
 						Utils.showToast(getActivity(),
@@ -142,23 +119,53 @@ public class ItemDetailFragment extends Fragment {
 	    }
 	  };
 
-	private void showItem(View rootView) {
+	private void showItem() {
 		if (item != null) {
-			((TextView) rootView.findViewById(R.id.title)).setText(item
-					.getTitle());
+			TextView title = (TextView) rootView.findViewById(R.id.title);
+			title.setText(item.getTitle());
+			title.setVisibility(View.VISIBLE);
+
 			if (item.getImage() != null) {
+				ImageView image = (ImageView) rootView.findViewById(R.id.item_logo);
 				Utils.setImage(
-						((ImageView) rootView.findViewById(R.id.item_logo)),
+						image,
 						item.getImage());
-			}
-			if (item.getDescription() != null) {
-				((TextView) rootView.findViewById(R.id.detail_text))
-						.setText(item.getDescription());
+				image.setVisibility(View.VISIBLE);
 			}
 			
+			if (item.getDescription() != null) {
+				TextView detail = (TextView) rootView.findViewById(R.id.detail_text);
+				detail.setText(item.getDescription());
+				detail.setVisibility(View.VISIBLE);
+			}
+			
+			ratingBar = (RatingBar) rootView.findViewById(R.id.rating_bar);
+			
+			//If User has rated the item
+			Rating rating = new Rating(surveyId,itemId);
+			DatabaseConnector.getInstance().open();
+			if (DatabaseConnector.getInstance().isRatingExist(rating)){
+				displayRatingElementsAfterRating(item.getRating());
+			} else {
+				Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
+				rateButton.setOnClickListener(rateHandler);
+				rateButton.setVisibility(View.VISIBLE);
+			}
+			ratingBar.setVisibility(View.VISIBLE);
+			DatabaseConnector.getInstance().close();
 		}
 	}
 	
-	
-	
+	private void displayRatingElementsAfterRating(double rating) {
+		String averageRating = " "+rating;
+		
+		Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
+		rateButton.setVisibility(View.INVISIBLE);
+		
+		TextView ratingText = (TextView) rootView.findViewById(R.id.rating_text);
+		ratingText.setText(getString(R.string.text_already_rated) + averageRating);
+		
+		ratingBar.setEnabled(false);
+		ratingBar.setRating((float)rating);
+	}
 }

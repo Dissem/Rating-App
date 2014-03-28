@@ -16,6 +16,7 @@
         android:layout_margin="8dp"
         android:text="Title"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:visibility="invisible"
         tools:ignore="HardcodedText" />
 
     <ImageView
@@ -23,9 +24,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title"
-        android:layout_centerHorizontal="true"
+        android:layout_centerHorizontal="false"
         android:layout_margin="16dp"
         android:src="@drawable/ic_launcher"
+        android:visibility="invisible"
         tools:ignore="ContentDescription" />
 
     <RatingBar
@@ -33,37 +35,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="8dp" />
-
+        android:layout_alignParentLeft="true"
+        android:layout_centerHorizontal="false"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="0dp"
+        android:maxHeight="48dp"
+        android:minHeight="48dp"
+        android:visibility="invisible" />
+    
+    <Button
+        android:id="@+id/rate_button"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="8dp"
+        android:onClick="saveRating"
+        android:text="@string/rate_item"
+        android:visibility="invisible" />
+    
     <TextView
         android:id="@+id/detail_text"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_above="@+id/rating_bar"
+        android:layout_height="151dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/item_logo"
         android:layout_gravity="left"
         android:layout_margin="8dp"
         android:text="Detail description"
+        android:visibility="invisible"
         tools:ignore="HardcodedText" />
-
-    <Button
-        android:id="@+id/rate_button"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/item_logo"
-        android:layout_alignRight="@+id/title"
-        android:onClick="saveRating"
-        android:text="@string/rate_item" />
 
     <TextView
         android:id="@+id/rating_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/rating_bar"
-        android:layout_alignLeft="@+id/rating_bar" />
+        android:layout_alignLeft="@+id/rating_bar"
+        android:layout_marginLeft="7dp" />
 
 </RelativeLayout>

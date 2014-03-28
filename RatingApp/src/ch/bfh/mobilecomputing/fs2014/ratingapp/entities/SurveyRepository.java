@@ -4,13 +4,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -92,7 +90,7 @@ public class SurveyRepository {
 		SurveyRepository.surveyId = surveyId;
 	}
 
-	public void writeItemRating(final Context context, final String surveyId, final int itemId, final double rating, final RepositoryCallback<HttpResponse> callback) {
+	public void writeItemRating(final Context context, final String surveyId, final int itemId, final double rating, final RepositoryCallback<String> callback) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -101,8 +99,6 @@ public class SurveyRepository {
 							+ "/items/" + itemId + "/rate");
 					
 					JSONObject data = new JSONObject();
-
-					// Todo Rating dynamically
 					JSONObject item = new JSONObject();
 					item.put("rating", rating);
 					item.put("userId", getAndroidId());
@@ -122,9 +118,7 @@ public class SurveyRepository {
 					DatabaseConnector.getInstance().createRating(rating);
 					DatabaseConnector.getInstance().close();
 					
-					ResponseHandler responseHandler = new BasicResponseHandler(); 
-					final HttpResponse response = httpclient.execute(httpPost, responseHandler);
-					
+					final String response = httpclient.execute(httpPost, new BasicResponseHandler());
 					
 					new Handler(Looper.getMainLooper()).post(new Runnable() {
 						@Override
