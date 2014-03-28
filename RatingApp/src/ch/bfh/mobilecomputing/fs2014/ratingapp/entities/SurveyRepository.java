@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -91,12 +92,11 @@ public class SurveyRepository {
 		SurveyRepository.surveyId = surveyId;
 	}
 
-	public void writeItemRating(final String surveyId, final int itemId, final double rating) {
+	public void writeItemRating(final Context context, final String surveyId, final int itemId, final double rating, final RepositoryCallback<HttpResponse> callback) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-
 					URL url = new URL(RATING_API_URI + "/surveys/" + surveyId
 							+ "/items/" + itemId + "/rate");
 					
@@ -106,9 +106,7 @@ public class SurveyRepository {
 					JSONObject item = new JSONObject();
 					item.put("rating", rating);
 					item.put("userId", getAndroidId());
-
 					data.put("data", item);
-					System.out.println(data.toString());
 
 					DefaultHttpClient httpclient = new DefaultHttpClient();
 					HttpPost httpPost = new HttpPost(url.toString());
@@ -119,12 +117,28 @@ public class SurveyRepository {
 					httpPost.setHeader("Accept", "application/json");
 					httpPost.setHeader("Content-type", "application/json");
 					
-					ResponseHandler responseHandler = new BasicResponseHandler(); 
-					httpclient.execute(httpPost,
-					responseHandler);
+					DatabaseConnector.getInstance().open();
+					Rating rating = new Rating(surveyId,itemId);
+					DatabaseConnector.getInstance().createRating(rating);
+					DatabaseConnector.getInstance().close();
 					
-					System.out.println("responseItemRating called");
+					ResponseHandler responseHandler = new BasicResponseHandler(); 
+					final HttpResponse response = httpclient.execute(httpPost, responseHandler);
+					
+					
+					new Handler(Looper.getMainLooper()).post(new Runnable() {
+						@Override
+						public void run() {
+							callback.onReceived(response);
+						}
+					});
 				} catch (final Exception e) {
+					new Handler(Looper.getMainLooper()).post(new Runnable() {
+						@Override
+						public void run() {
+							callback.onError(e);
+						}
+					});
 				}
 			}
 		}).start();

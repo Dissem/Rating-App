@@ -2,6 +2,8 @@ package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
 import java.lang.reflect.Method;
 
+import org.apache.http.HttpResponse;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.DatabaseConnector;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Rating;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
@@ -73,6 +77,25 @@ public class ItemDetailFragment extends Fragment {
 						public void onReceived(Survey entity) {
 							item = entity.getItem(itemId);
 							showItem(rootView);
+							
+							ratingBar = (RatingBar) rootView.findViewById(R.id.rating_bar);
+							
+							Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
+							rateButton.setOnClickListener(rateHandler);
+							
+							TextView ratingText = (TextView) rootView.findViewById(R.id.rating_text);
+							
+							//If User has rated the item
+							Rating rating = new Rating(surveyId,itemId);
+							DatabaseConnector.getInstance().open();
+							if (DatabaseConnector.getInstance().isRatingExist(rating)){
+								rateButton.setVisibility(View.GONE);
+								String averageRating = " "+item.getRating();
+								ratingText.setText(getString(R.string.text_already_rated) + averageRating);
+								ratingBar.setEnabled(false);
+								ratingBar.setRating((float)item.getRating());
+							}
+							DatabaseConnector.getInstance().close();
 						}
 
 						@Override
@@ -83,12 +106,7 @@ public class ItemDetailFragment extends Fragment {
 						}
 					});
 		}
-		
-		Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
-		rateButton.setOnClickListener(rateHandler);
-		
-		ratingBar = (RatingBar) rootView.findViewById(R.id.rating_bar);
-		 
+
 		return rootView;
 	}
 	
@@ -101,12 +119,26 @@ public class ItemDetailFragment extends Fragment {
 	    	final double rating = (double)ratingBar.getRating();
 	    	if (rating == 0) {
 	    		Utils.showToast(getActivity(),
-						R.string.rate_zero_error,
+						R.string.item_rate_zero_error,
 						Toast.LENGTH_LONG);
 	    	} else {
-	    		SurveyRepository.getInstance().writeItemRating(surveyId, itemId, rating);
+	    		SurveyRepository.getInstance().writeItemRating(v.getContext(), surveyId, itemId, rating, new RepositoryCallback<HttpResponse>() {
+					@Override
+					public void onReceived(HttpResponse response) {
+						
+						Utils.showToast(getActivity(),
+								R.string.item_rate_success,
+								Toast.LENGTH_LONG);
+					}
+
+					@Override
+					public void onError(Exception e) {
+						Utils.showToast(getActivity(),
+								R.string.item_rate_error,
+								Toast.LENGTH_LONG);
+					}
+				});
 	    	}
-			
 	    }
 	  };
 
@@ -123,6 +155,7 @@ public class ItemDetailFragment extends Fragment {
 				((TextView) rootView.findViewById(R.id.detail_text))
 						.setText(item.getDescription());
 			}
+			
 		}
 	}
 	
