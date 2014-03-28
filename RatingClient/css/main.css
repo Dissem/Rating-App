@@ -8,3 +8,9 @@
 	padding-right: 5px;
 	float: left;
 }
+
+.item {
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	margin-bottom: 5px;
+}
