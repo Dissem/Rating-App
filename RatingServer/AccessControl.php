@@ -7,7 +7,7 @@ class AccessControl implements iAuthenticate
     public static $role = 'user';
     public function __isAllowed()
     {
-        $roles = array('12345' => 'user', 'SpJNTrgBrpkGS8g3' => 'admin');
+        $roles = array('12345' => 'user', '67890' => 'admin');
         if (!isset($_GET['secret'])
             || !array_key_exists($_GET['secret'], $roles)
         ) {
