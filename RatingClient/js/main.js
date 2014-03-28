@@ -1,4 +1,6 @@
 $(document).ready(function() {
+	var apiurl = 'http://localhost/ratingapp/RatingServer/surveys/?secret=67890';
+
 	var items = [];
 
 	$('#form-survey').submit(function(e) {
@@ -36,12 +38,13 @@ $(document).ready(function() {
 	}
 
 	function itemDOM(item, imageFile) {
-		var div = $('<div class="row">');
+
+		var div = $('<div class="row col-sm-10 col-sm-offset-2 item bg-info">');
 		div.append($('<div class="col-xs-1 text-right">'+item.itemId+'</div>'));
 		var divRight = $('<div class="col-xs-11">');
 		divRight.append(imgDOM(imageFile));
-		divRight.append($('<p>'+item.title+'</p>'))
-		divRight.append($('<p class="text-muted">'+item.description+'</p>'))
+		divRight.append($('<p>'+item.title+' <span class="text-muted">'+item.subtitle+'</span></p>'))
+		divRight.append($('<p class="text-info">'+item.subtitle+'</p>'))
 		div.append(divRight);
 		return div;
 	}
@@ -112,7 +115,7 @@ $(document).ready(function() {
 		}
 
 		$.ajax({
-			url: 'http://localhost/ratingapp/RatingServer/surveys/?secret=67890',
+			url: apiurl,
 			type: 'post',
 			data: survey,
 			success: function(){
