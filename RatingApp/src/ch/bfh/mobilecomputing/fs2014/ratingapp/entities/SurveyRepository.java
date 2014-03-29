@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -23,15 +22,17 @@ import android.provider.Settings.Secure;
 public class SurveyRepository {
 	private static SurveyRepository INSTANCE;
 
-	private static String RATING_API_URI = "http://ratingapi.dissem.ch";
+	static final String RATING_API_URI = "https://ratingapi.dissem.ch";
 
 	private static ContentResolver contentResolver;
 	private static SharedPreferences sharedPref;
 	private static String surveyId;
+	private static CACertHttpsHelper https;
 
 	private SurveyRepository(Activity activity) {
 		sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
 		contentResolver = activity.getContentResolver();
+		https = new CACertHttpsHelper(activity);
 	}
 
 	public static synchronized void init(Activity activity) {
@@ -47,7 +48,7 @@ public class SurveyRepository {
 				try {
 					URL url = new URL(RATING_API_URI + "/surveys/" + id);
 					BufferedReader in = new BufferedReader(
-							new InputStreamReader(url.openStream()));
+							new InputStreamReader(https.inputStream(url)));
 
 					StringBuilder json = new StringBuilder();
 					String inputLine;
@@ -90,14 +91,16 @@ public class SurveyRepository {
 		SurveyRepository.surveyId = surveyId;
 	}
 
-	public void writeItemRating(final Context context, final String surveyId, final int itemId, final double rating, final RepositoryCallback<String> callback) {
+	public void writeItemRating(final Context context, final String surveyId,
+			final int itemId, final double rating,
+			final RepositoryCallback<String> callback) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					URL url = new URL(RATING_API_URI + "/surveys/" + surveyId
 							+ "/items/" + itemId + "/rate");
-					
+
 					JSONObject data = new JSONObject();
 					JSONObject item = new JSONObject();
 					item.put("rating", rating);
@@ -106,20 +109,20 @@ public class SurveyRepository {
 
 					DefaultHttpClient httpclient = new DefaultHttpClient();
 					HttpPost httpPost = new HttpPost(url.toString());
-					StringEntity jsonEntity = new
-					StringEntity(data.toString());
+					StringEntity jsonEntity = new StringEntity(data.toString());
 					httpPost.setEntity(jsonEntity);
-					
+
 					httpPost.setHeader("Accept", "application/json");
 					httpPost.setHeader("Content-type", "application/json");
-					
+
 					DatabaseConnector.getInstance().open();
-					Rating rating = new Rating(surveyId,itemId);
+					Rating rating = new Rating(surveyId, itemId);
 					DatabaseConnector.getInstance().createRating(rating);
 					DatabaseConnector.getInstance().close();
-					
-					final String response = httpclient.execute(httpPost, new BasicResponseHandler());
-					
+
+					final String response = httpclient.execute(httpPost,
+							new BasicResponseHandler());
+
 					new Handler(Looper.getMainLooper()).post(new Runnable() {
 						@Override
 						public void run() {
