@@ -1,6 +1,5 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -13,14 +12,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.DatabaseConnector;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 
 public class MainActivity extends FragmentActivity implements
 		ItemListFragment.Callbacks {
-	private static final int ENTER_CODE_POSITION = 0;
-	private static final int SURVEY_POSITION = 1;
+	public static final int ENTER_CODE_POSITION = 0;
+	public static final int SURVEY_POSITION = 1;
 
 	private int lastPosition = -1;
 	private DrawerLayout drawerLayout;
@@ -122,7 +121,7 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	/** Swaps fragments in the main content view */
-	private void selectItem(int position) {
+	public void selectItem(int position) {
 		if (lastPosition != position) {
 			lastPosition = position;
 
@@ -174,20 +173,5 @@ public class MainActivity extends FragmentActivity implements
 	public void onItemSelected(Item id) {
 		if (itemListAndDetailFragment != null)
 			itemListAndDetailFragment.onItemSelected(id);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == 0) {
-			if (resultCode == RESULT_OK) {
-				String surveyId = data.getStringExtra("SCAN_RESULT");
-				surveyRepo.setSurveyId(surveyId);
-				selectItem(1);
-			}
-			if (resultCode == RESULT_CANCELED) {
-				// handle cancel
-			}
-		}
 	}
 }

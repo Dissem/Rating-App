@@ -3,6 +3,7 @@ package ch.bfh.mobilecomputing.fs2014.ratingapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,12 +85,17 @@ public class ItemListFragment extends ListFragment {
 			@Override
 			public void onReceived(Survey entity) {
 				survey = entity;
-				ListView listView = getListView();
-				LayoutInflater inflater = getLayoutInflater(null);
+				try {
+					ListView listView = getListView();
+					LayoutInflater inflater = getLayoutInflater(null);
 
-				ViewGroup header = (ViewGroup) inflater.inflate(
-						R.layout.list_header, listView, false);
-				listView.addHeaderView(header, entity.getTitle(), false);
+					ViewGroup header = (ViewGroup) inflater.inflate(
+							R.layout.list_header, listView, false);
+					listView.addHeaderView(header, entity.getTitle(), false);
+				} catch (IllegalStateException e) {
+					Log.e(getClass().getSimpleName(), e.getMessage());
+					// TODO: Is there something to do in this case?
+				}
 
 				setListAdapter(new ItemAdapter(getActivity(),
 						android.R.id.text1, entity.getItems()));

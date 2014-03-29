@@ -1,5 +1,6 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 
 public class EnterCodeFragment extends Fragment {
 	private final SurveyRepository surveyRepo = SurveyRepository.getInstance();
+	private TextView codeText;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -21,8 +23,7 @@ public class EnterCodeFragment extends Fragment {
 		final View rootView = inflater.inflate(R.layout.fragment_enter_code,
 				container, false);
 
-		final TextView codeText = (TextView) rootView
-				.findViewById(R.id.code_text);
+		codeText = (TextView) rootView.findViewById(R.id.code_text);
 		codeText.setText(surveyRepo.getSurveyId());
 
 		final Button startButton = (Button) rootView
@@ -64,5 +65,21 @@ public class EnterCodeFragment extends Fragment {
 		});
 
 		return rootView;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == 0) {
+			if (resultCode == Activity.RESULT_OK) {
+				String surveyId = data.getStringExtra("SCAN_RESULT");
+				surveyRepo.setSurveyId(surveyId);
+				codeText.setText(surveyId);
+				((MainActivity)getActivity()).selectItem(MainActivity.SURVEY_POSITION);
+			}
+			if (resultCode == Activity.RESULT_CANCELED) {
+				// handle cancel
+			}
+		}
 	}
 }
