@@ -27,10 +27,3 @@ CREATE TABLE `Vote` (
   PRIMARY KEY (`survey_id`,`item_id`, `user_id`),
   FOREIGN KEY (`survey_id`, `item_id`) REFERENCES `Item` (`survey_id`, `item_id`)
 );
-
-CREATE TABLE `Image` (
-  `name` varchar(50) NOT NULL,
-  `type` varchar(31) NOT NULL,
-  `data` longblob NOT NULL,
-  PRIMARY KEY (`name`)
-);

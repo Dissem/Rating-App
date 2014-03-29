@@ -67,22 +67,22 @@ class Surveys
     {
     	$survey = new stdClass();
 
-        $survey->surveyId    = $this->_check($data, 'surveyId');
-	    $survey->title       = $this->_check($data, 'title');
-	    $survey->subtitle    = $data['subtitle'];
-	    $survey->description = $data['description'];
-	    $survey->imageUrl    = $data['imageUrl'];
+        $survey->surveyId    = $this->_check($data, 'surveyId', true);
+	    $survey->title       = $this->_check($data, 'title', true);
+	    $survey->subtitle    = $this->_check($data, 'subtitle');
+	    $survey->description = $this->_check($data, 'description');
+	    $survey->imageUrl    = $this->_check($data, 'imageUrl');
 	    $survey->items       = array();
 
-	    foreach ($data['items'] as $i) {
+	    foreach ($this->_check($data, 'items', true) as $i) {
 	    	$item              = new stdClass();
 
 	    	$item->surveyId    = $survey->surveyId;
-	        $item->itemId      = $this->_check($i, 'itemId');
-		    $item->title       = $this->_check($i, 'title');
-		    $item->subtitle    = $i['subtitle'];
-		    $item->description = $i['description'];
-		    $item->imageUrl    = $i['imageUrl'];
+	        $item->itemId      = $this->_check($i, 'itemId', true);
+		    $item->title       = $this->_check($i, 'title', true);
+		    $item->subtitle    = $this->_check($i, 'subtitle');
+		    $item->description = $this->_check($i, 'description');
+		    $item->imageUrl    = $this->_check($i, 'imageUrl');
 
 		    $survey->items[]   = $item;
 	    }
@@ -117,9 +117,13 @@ class Surveys
         return $survey;
     }
 
-    function _check($data, $field) {
-        if (!isset($data[$field]))
-            throw new RestException(400, "$field field missing");
+    function _check($data, $field, $required=false) {
+        if (!isset($data[$field])) {
+        	if ($required)
+        		throw new RestException(400, "$field field missing");
+        	else
+        		return null;
+        }
         return $data[$field];
     }
 }

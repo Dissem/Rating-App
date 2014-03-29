@@ -6,25 +6,16 @@ class Images
      */
     function get($name)
     {
-		include 'config.php';
-		
-		$engine = 'mysql';
-		
-		$dns = $engine.':dbname='.$mysql_db.';host='.$mysql_server;
-		$db = new PDO( $dns, $mysql_user, $mysql_password );
-		
-		$stmt = $db->prepare("select type, data from Image where name=?");
-		$stmt->execute(array($name));
-		$stmt->bindColumn(1, $type, PDO::PARAM_STR, 256);
-		$stmt->bindColumn(2, $data, PDO::PARAM_LOB);
-		$stmt->fetchAll(PDO::FETCH_BOUND);
+		$type = exif_imagetype("data/$name");
+		if (!$type)
+			throw new RestException(404, "Image $name was not found");
 		
 		header("Cache-Control: public, max-age=31536000"); // I give it a year
 		header("Content-Type: $type");
 		$extension = substr(strrchr($type, "/"), 1);
 		header("Content-Disposition: inline; filename=\"$name.$extension\"");
 
-		echo($data);
+		readfile("data/$name");
 	}
 
  	/**
@@ -32,20 +23,15 @@ class Images
      * @class  AccessControl {@requires admin}
      */
 	function post($request_data = NULL) {
-		include 'config.php';
+		if (!isset($request_data['fileUpload']))
+			throw new RestException(400, "The field fileUpload doesn't exist, there's something wrong with the sent data.");
 
 		$image = $request_data['fileUpload'];
 
 		$name = uniqid();
-		$data = fopen($image['tmp_name'], 'rb');
 
-		$engine = 'mysql';
-		
-		$dns = $engine.':dbname='.$mysql_db.';host='.$mysql_server;
-		$db = new PDO( $dns, $mysql_user, $mysql_password );
-		
-		$stmt = $db->prepare("insert into Image (name, type, data) values (?, ?, ?)");
-		$stmt->execute(array($name, $image['type'], $data));
+		if (!move_uploaded_file($image['tmp_name'], "data/$name"))
+			throw new RestException(500, "There was a problem with the uploaded file, please try again.");
 
 		return array("name" => $name);
 	}
