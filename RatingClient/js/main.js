@@ -1,8 +1,26 @@
 $(document).ready(function() {
-	var apiurl = 'http://localhost/ratingapp/RatingServer/surveys/?secret=67890';
+	// Configuration
+	var apiurl = $.cookie('rating_apiurl') || 'https://ratingapi.dissem.ch';
+	var apisecret = $.cookie('rating_apisecret') || '67890';
 
+	// Initialization:
 	var items = [];
+	$('#api-secret').val(apisecret);
+	$('#api-secret').hover(function(){
+		$('#api-secret').attr('type', 'text');
+	}, function(){
+		$('#api-secret').attr('type', 'password');
+	});
+	$('#api-secret').blur(function(){
+		$.cookie('rating_apisecret', $('#api-secret').val());
+	});
 
+	$('#api-url').val(apiurl);
+	$('#api-url').blur(function(){
+		$.cookie('rating_apiurl', $('#api-url').val());
+	});
+
+	// And now for some action:
 	$('#form-survey').submit(function(e) {
 		// Don't actually submit, JavaScript will handle this
 		// A 'pre-submit' should happen though, so the fields
@@ -65,6 +83,8 @@ $(document).ready(function() {
 	}
 
 	$('#btnCreateSurvey').click(function(){
+		apisecret = $('#api-secret').val();
+
 		if ($('#item-title').val() != '') {
 			bootbox.dialog({
 				message: "There is still text in the item dialog, do you want to create an item?",
@@ -88,9 +108,6 @@ $(document).ready(function() {
 					cancel: {
 						label: "Let me look at it again",
 						className: "btn-primary",
-						callback: function() {
-							// Example.show("great success");
-						}
 					}
 				}
 			});
@@ -102,38 +119,85 @@ $(document).ready(function() {
 	});
 
 	function submitSurvey() {
+		uploadDeferred = $.Deferred();
+		uploadDeferred.imagesTODO = 0;
+		uploadDeferred.imagesDone = 0;
+		uploadDeferred.imagesError = 0;
+
 		$(items).each(function(){
-			this.imageUrl = uploadImage(this.imageUrl);
+			uploadImage(this);
 		});
 		var survey = {
 			surveyId: $('#survey-id').val(),
 			title: $('#survey-title').val(),
 			subtitle: $('#survey-subtitle').val(),
 			description: $('#survey-description').val(),
-			imageUrl: uploadImage($('#survey-image')[0].files[0]),
+			imageUrl: $('#survey-image')[0].files[0],
 			items: items
 		}
+		uploadImage(survey);
 
-		$.ajax({
-			url: apiurl,
-			type: 'post',
-			data: survey,
-			success: function(){
-				bootbox.alert('Survey successfully submitted');
-			},
-			error: function(){
-				bootbox.alert('There was an error submitting the survey');
-				console.log(arguments);
-			}
+		uploadDeferred.done(function(){
+			$.ajax({
+				url: apiurl+'/surveys/?secret='+apisecret,
+				type: 'post',
+				data: survey,
+				success: function(){
+					bootbox.alert('Survey successfully submitted');
+				},
+				error: function(data){
+					bootbox.alert('There was an error submitting the survey: '+data);
+					console.log(arguments);
+				}
+			});
+			console.log(survey);
 		});
-		console.log(survey);
 	}
 
-	function uploadImage(file) {
-		if (!file)
-			return null;
+	var uploadDeferred;
 
-		return null; // TODO
+	function uploadImage(item) {
+		if (!item.imageUrl)
+			return;
+
+		uploadDeferred.imagesTODO++;
+		var fd = new FormData();
+
+		// HTML file input user's choice...
+		fd.append("fileUpload", item.imageUrl);
+
+		$.ajax({
+			url: apiurl+'/images/?secret='+apisecret,
+			type: 'POST',
+			data: fd,
+			processData: false,  // tell jQuery not to process the data
+			contentType: false,   // tell jQuery not to set contentType
+			success: function(data){
+				item.imageUrl = apiurl+'/images/'+data.name;
+				// bootbox.alert(item.imageUrl);
+				deferred(true);
+			},
+			error: function(data){
+				// bootbox.alert('Image upload failed for item '+item.title+', cause: '+data);
+				console.log(arguments);
+				deferred(false);
+			}
+		});
+
+		function deferred(success) {
+			if (success)
+				uploadDeferred.imagesDone++;
+			else
+				uploadDeferred.imagesError++;
+			uploadDeferred.imagesTODO--;
+			if (uploadDeferred.imagesTODO == 0) {
+				if (uploadDeferred.imagesError>0){
+					uploadDeferred.reject();
+				} else {
+					uploadDeferred.resolve();
+				}
+			}
+		}
 	}
 
 });
