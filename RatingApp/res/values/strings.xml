@@ -17,5 +17,6 @@
     <string name="item_rate_error">Couldn\'t rate item</string>
     <string name="item_rate_success">Item successfully rated</string>
     <string name="text_already_rated">You have already rated this item. \nAverage Rating: </string>
+    <string name="text_not_yet_rated">not yet rated</string>
     <string name="reload">Reload</string>
 </resources>

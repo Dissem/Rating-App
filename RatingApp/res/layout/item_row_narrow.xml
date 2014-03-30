@@ -39,14 +39,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/fontSize_rating" />
+            
+            <TextView
+                android:id="@+id/txtVotes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="3dp"
+                android:textSize="@dimen/fontSize_rating" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/txtAuthors"
+            android:id="@+id/txtSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#777"
-            android:textSize="@dimen/fontSize_desc" />
+            android:textSize="@dimen/fontSize_subtitle" />
 
         <RatingBar
             android:id="@+id/ratingBar"

@@ -10,5 +10,5 @@
 	    android:textSize="@dimen/fontSize_listTitle"
 	    android:paddingTop="7dp"
 	    android:paddingBottom="7dp"
-	    android:text="Survey title" />
+	    android:textColor="@color/orange" />
 </LinearLayout>

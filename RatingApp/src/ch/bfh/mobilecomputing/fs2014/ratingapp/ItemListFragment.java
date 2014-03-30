@@ -1,5 +1,7 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
+import java.util.Collections;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -8,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.DatabaseConnector;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
@@ -83,7 +87,7 @@ public class ItemListFragment extends ListFragment {
 		surveyId = surveyRepo.getSurveyId();
 
 		surveyRepo.requestSurvey(surveyId, surveyRepoCallback,
-				CallbackMode.CACHED);
+				CallbackMode.BOTH);
 	}
 
 	RepositoryCallback<Survey> surveyRepoCallback = new RepositoryCallback<Survey>() {
@@ -94,14 +98,14 @@ public class ItemListFragment extends ListFragment {
 				ListView listView = getListView();
 				LayoutInflater inflater = getLayoutInflater(null);
 
-				ViewGroup header = (ViewGroup) inflater.inflate(
-						R.layout.list_header, listView, false);
-				listView.addHeaderView(header, entity.getTitle(), false);
+				initListHeader(listView, inflater, survey);
 			} catch (IllegalStateException e) {
 				Log.e(getClass().getSimpleName(), e.getMessage());
 				// TODO: Is there something to do in this case?
 			}
 
+			DatabaseConnector.getInstance().open();
+			Collections.sort(entity.getItems());
 			setListAdapter(new ItemAdapter(getActivity(), android.R.id.text1,
 					entity.getItems()));
 		}
@@ -118,7 +122,7 @@ public class ItemListFragment extends ListFragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		setActivateOnItemClick(true);
-
+		
 		// Restore the previously serialized activated item position.
 		if (savedInstanceState != null
 				&& savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
@@ -188,5 +192,12 @@ public class ItemListFragment extends ListFragment {
 		}
 
 		mActivatedPosition = position;
+	}
+	
+	private void initListHeader(ListView listView, LayoutInflater inflater, Survey survey) {
+		View header = inflater.inflate(R.layout.list_header, listView, false);
+		TextView txtHeader = (TextView) header.findViewById(R.id.txtListHeader);
+		txtHeader.setText(survey.getTitle());
+		listView.addHeaderView(header);
 	}
 }

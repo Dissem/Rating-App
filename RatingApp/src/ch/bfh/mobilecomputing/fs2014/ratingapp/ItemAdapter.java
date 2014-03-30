@@ -9,8 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.DatabaseConnector;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Rating;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
-import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 
 public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 
@@ -21,43 +22,67 @@ public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View row = convertView;
-		
+
 		if (row == null) {
 			LayoutInflater inflater = LayoutInflater.from(getContext());
 			row = inflater.inflate(R.layout.item_row, null);
 		}
-		
+
 		Survey.Item item = getItem(position);
-		
+		Rating internalRating = new Rating(item.getSurveyId(), item.getId());
+
 		TextView rank = (TextView) row.findViewById(R.id.txtRank);
-		TextView name = (TextView) row.findViewById(R.id.txtTitle);
-		TextView authors = (TextView) row.findViewById(R.id.txtAuthors);
+		TextView title = (TextView) row.findViewById(R.id.txtTitle);
+		TextView subtitle = (TextView) row.findViewById(R.id.txtSubtitle);
 		TextView rating = (TextView) row.findViewById(R.id.txtRating);
+		TextView votes = (TextView) row.findViewById(R.id.txtVotes);
 		RatingBar ratingBar = (RatingBar) row.findViewById(R.id.ratingBar);
-		
+
 		if (rank != null) {
-			rank.setText(item.getId() + ".");
+			if (!DatabaseConnector.getInstance().isRatingExist(internalRating)) {
+				rank.setText("#");
+			} else {
+				rank.setText("#");
+			}
 		}
-		if (name != null) {
-			name.setText(item.getTitle());
+
+		if (title != null) {
+			title.setText(item.getTitle());
 		}
-		if (authors != null) {
-			authors.setText("[Team members]"); // TODO
+
+		if (subtitle != null) {
+			String text = ((item.getSubtitle() == null) ? "" : item
+					.getSubtitle());
+			subtitle.setText(text);
 		}
+
 		if (rating != null) {
-			rating.setText(String.valueOf(item.getRating()));
+			if (!DatabaseConnector.getInstance().isRatingExist(internalRating)) {
+				rating.setText(R.string.text_not_yet_rated);
+			} else {
+				rating.setText(String.format("%.2f", item.getRating()));
+			}
 		}
+
+		if (votes != null) {
+			if (DatabaseConnector.getInstance().isRatingExist(internalRating)) {
+				if (item.getVotes() == 1) {
+					votes.setText("(" + item.getVotes() + " vote)");
+				} else {
+					votes.setText("(" + item.getVotes() + " votes)");
+				}
+			}
+		}
+
 		if (ratingBar != null) {
-//			if (!item.isRated()) {
-//				rating.setVisibility(TextView.GONE);
-//				ratingBar.setVisibility(RatingBar.GONE);
-//			} else {
-				ratingBar.setRating((float) item.getRating());	
-//			}			
+			if (!DatabaseConnector.getInstance().isRatingExist(internalRating)) {
+				ratingBar.setEnabled(false);
+			} else {
+				ratingBar.setRating((float) item.getRating());
+			}
 		}
-		
+
 		return row;
 	}
-	
 
 }
