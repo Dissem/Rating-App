@@ -4,9 +4,17 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.CallbackMode;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.RepositoryCallback;
 
 /**
  * An activity representing a list of Items. This activity has different
@@ -31,19 +39,13 @@ public class ItemListAndDetailFragment extends Fragment implements
 	 * device.
 	 */
 	private boolean twoPane;
+	private ItemListFragment listFragment;
+	private ItemDetailFragment detailFragment;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// FIXME
-		// // Create the detail fragment and add it to the activity
-		// // using a fragment transaction.
-		// Bundle arguments = new Bundle();
-		// arguments.putString(ItemListFragment.ARG_SURVEY_ID, getIntent()
-		// .getStringExtra(ItemListFragment.ARG_SURVEY_ID));
-		// getFragmentManager().findFragmentById(R.id.item_list).setArguments(
-		// arguments);
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -51,9 +53,9 @@ public class ItemListAndDetailFragment extends Fragment implements
 			Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.fragment_item_list,
 				container, false);
-		ItemListFragment fragment = new ItemListFragment();
-		getFragmentManager().beginTransaction().add(R.id.item_list, fragment)
-				.commit();
+		listFragment = new ItemListFragment();
+		getFragmentManager().beginTransaction()
+				.add(R.id.item_list, listFragment).commit();
 
 		// The detail container view will be present only in the
 		// large-screen layouts (res/values-large and
@@ -74,8 +76,8 @@ public class ItemListAndDetailFragment extends Fragment implements
 		arguments.putString(ItemDetailFragment.ARG_SURVEY_ID,
 				item.getSurveyId());
 		arguments.putInt(ItemDetailFragment.ARG_ITEM_ID, item.getId());
-		ItemDetailFragment fragment = new ItemDetailFragment();
-		fragment.setArguments(arguments);
+		detailFragment = new ItemDetailFragment();
+		detailFragment.setArguments(arguments);
 
 		int container;
 		if (twoPane) {
@@ -90,9 +92,48 @@ public class ItemListAndDetailFragment extends Fragment implements
 		}
 		if (getFragmentManager() != null) {
 			FragmentTransaction tx = getFragmentManager().beginTransaction();
-			tx.replace(container, fragment);
+			tx.replace(container, detailFragment);
 			tx.addToBackStack("detail");
 			tx.commit();
+		}
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.menu_survey, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_reload:
+			SurveyRepository repo = SurveyRepository.getInstance();
+			repo.requestSurvey(repo.getSurveyId(),
+					new RepositoryCallback<Survey>() {
+						@Override
+						public void onReceived(Survey entity) {
+							if (listFragment != null
+									&& listFragment.isVisible())
+								listFragment.surveyRepoCallback
+										.onReceived(entity);
+							if (detailFragment != null
+									&& detailFragment.isVisible())
+								detailFragment.surveyRepoCallback
+										.onReceived(entity);
+						}
+
+						@Override
+						public void onError(Exception e) {
+							Utils.showToast(getActivity(),
+									R.string.survey_load_error,
+									Toast.LENGTH_LONG);
+						}
+					}, CallbackMode.FRESH_ONLY);
+
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 }

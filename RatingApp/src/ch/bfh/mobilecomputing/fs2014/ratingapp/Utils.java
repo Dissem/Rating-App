@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.CACertHttpsHelper;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,15 +19,18 @@ public class Utils {
 	private static Map<Uri, Bitmap> IMAGE_MAP = new HashMap<Uri, Bitmap>();
 
 	public static void setImage(final ImageView view, final Uri uri) {
+
 		if (IMAGE_MAP.containsKey(uri)) {
 			view.setImageBitmap(IMAGE_MAP.get(uri));
 		} else {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
+					final Context ctx = view.getContext();
+					final CACertHttpsHelper https = new CACertHttpsHelper(ctx);
 					try {
-						final Bitmap bm = BitmapFactory.decodeStream(new URL(
-								uri.toString()).openStream());
+						final Bitmap bm = BitmapFactory.decodeStream(https
+								.inputStream(new URL(uri.toString())));
 						IMAGE_MAP.put(uri, bm);
 						new Handler(Looper.getMainLooper())
 								.post(new Runnable() {
@@ -36,7 +41,7 @@ public class Utils {
 								});
 					} catch (Exception e) {
 						e.printStackTrace();
-						showToast(view.getContext(), R.string.image_load_error,
+						showToast(ctx, R.string.image_load_error,
 								Toast.LENGTH_SHORT);
 					}
 				}

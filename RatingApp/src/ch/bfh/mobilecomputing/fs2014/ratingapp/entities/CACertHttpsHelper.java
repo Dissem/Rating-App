@@ -1,7 +1,11 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp.entities;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
@@ -22,7 +26,7 @@ import android.util.Log;
  */
 public class CACertHttpsHelper {
 	private KeyStore keyStore;
-	private SSLContext sslContext;
+	private SSLContext sslCtx;
 
 	public CACertHttpsHelper(Context ctx) {
 		try {
@@ -57,8 +61,8 @@ public class CACertHttpsHelper {
 			tmf.init(keyStore);
 
 			// Create an SSLContext that uses our TrustManager
-			sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, tmf.getTrustManagers(), null);
+			sslCtx = SSLContext.getInstance("TLS");
+			sslCtx.init(null, tmf.getTrustManagers(), null);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -67,14 +71,38 @@ public class CACertHttpsHelper {
 
 	public InputStream inputStream(URL url) {
 		try {
-			// Tell the URLConnection to use a SocketFactory from our SSLContext
-			HttpsURLConnection urlConnection = (HttpsURLConnection) url
-					.openConnection();
-			urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
-
-			return urlConnection.getInputStream();
+			URLConnection c = url.openConnection();
+			if (c instanceof HttpsURLConnection
+					&& url.getHost().contains("dissem.ch")) {
+				// Tell the URLConnection to use a SocketFactory from our
+				// SSLContext
+				HttpsURLConnection urlConnection = (HttpsURLConnection) c;
+				urlConnection.setSSLSocketFactory(sslCtx.getSocketFactory());
+			}
+			return c.getInputStream();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public String post(URL url, String data) throws IOException {
+		HttpURLConnection c = (HttpURLConnection) url.openConnection();
+		if (c instanceof HttpsURLConnection
+				&& url.getHost().contains("dissem.ch")) {
+			((HttpsURLConnection) c).setSSLSocketFactory(sslCtx
+					.getSocketFactory());
+		}
+		c.setRequestMethod("POST");
+		c.setRequestProperty("Accept", "application/json");
+		c.setRequestProperty("Content-Type", "application/json");
+		OutputStreamWriter writer = new OutputStreamWriter(c.getOutputStream());
+		writer.write(data.toString());
+		writer.close();
+
+		if (c.getResponseCode() != HttpURLConnection.HTTP_OK) {
+			throw new IOException(c.getResponseMessage());
+		}
+
+		return c.getResponseMessage();
 	}
 }

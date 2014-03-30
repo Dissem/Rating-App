@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -22,14 +23,18 @@ public class Survey {
 	private Uri image;
 	private List<Item> items = new ArrayList<Item>();
 
-	public Survey(JSONObject data) throws JSONException {
-		id = data.getString("surveyId");
-		title = data.getString("title");
-		description = data.getString("description");
-		image = Uri.parse(data.getString("imageUrl"));
-		JSONArray itemArray = data.getJSONArray("items");
-		for (int i = 0; i < itemArray.length(); i++) {
-			items.add(new Item(itemArray.getJSONObject(i)));
+	public Survey(JSONObject data) {
+		id = str(data, "surveyId");
+		title = str(data, "title");
+		description = str(data, "description");
+		image = uri(data, "imageUrl");
+		try {
+			JSONArray itemArray = data.getJSONArray("items");
+			for (int i = 0; i < itemArray.length(); i++) {
+				items.add(new Item(itemArray.getJSONObject(i)));
+			}
+		} catch (JSONException e) {
+			Log.e("Survey", e.getMessage(), e);
 		}
 	}
 
@@ -71,14 +76,13 @@ public class Survey {
 		private double rating;
 		private int votes;
 
-		private Item(JSONObject itemData) throws JSONException {
-			id = itemData.getInt("itemId");
-			title = itemData.getString("title");
-			description = itemData.getString("description");
-			String imageUrl = itemData.getString("imageUrl");
-			image = (imageUrl == null ? null : Uri.parse(imageUrl));
-			rating = itemData.getDouble("rating");
-			votes = itemData.getInt("votes");
+		private Item(JSONObject itemData) {
+			id = num(itemData, "itemId");
+			title = str(itemData, "title");
+			description = str(itemData, "description");
+			image = uri(itemData, "imageUrl");
+			rating = dec(itemData, "rating");
+			votes = num(itemData, "votes");
 		}
 
 		public int getId() {
@@ -113,6 +117,51 @@ public class Survey {
 		public String toString() {
 			return Survey.this.id + "/" + id + ": " + title + " (" + rating
 					+ ")";
+		}
+	}
+
+	private static String str(JSONObject data, String field) {
+		if (data.isNull(field))
+			return null;
+
+		try {
+			return data.getString(field).trim();
+		} catch (JSONException e) {
+			Log.e("Survey", e.getMessage(), e);
+			return null;
+		}
+	}
+
+	private static int num(JSONObject data, String field) {
+		try {
+			return data.getInt(field);
+		} catch (JSONException e) {
+			Log.e("Survey", e.getMessage(), e);
+			return 0;
+		}
+	}
+
+	private static double dec(JSONObject data, String field) {
+		try {
+			return data.getDouble(field);
+		} catch (JSONException e) {
+			Log.e("Survey", e.getMessage(), e);
+			return 0;
+		}
+	}
+
+	private static Uri uri(JSONObject data, String field) {
+		if (data.isNull(field))
+			return null;
+
+		try {
+			String url = data.getString(field).trim();
+			if (url.length() == 0)
+				return null;
+			return Uri.parse(url);
+		} catch (JSONException e) {
+			Log.e("Survey", e.getMessage(), e);
+			return null;
 		}
 	}
 }

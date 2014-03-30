@@ -3,11 +3,9 @@ package ch.bfh.mobilecomputing.fs2014.ratingapp.entities;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -28,6 +26,7 @@ public class SurveyRepository {
 	private static SharedPreferences sharedPref;
 	private static String surveyId;
 	private static CACertHttpsHelper https;
+	private static Map<String, Survey> cache = new HashMap<String, Survey>();
 
 	private SurveyRepository(Activity activity) {
 		sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
@@ -41,6 +40,25 @@ public class SurveyRepository {
 	}
 
 	public void requestSurvey(final String id,
+			final RepositoryCallback<Survey> callback, CallbackMode mode) {
+		boolean cacheSuccessful = cache.containsKey(id);
+		if (mode != CallbackMode.FRESH_ONLY && cacheSuccessful)
+			callback.onReceived(cache.get(id));
+
+		switch (mode) {
+		case CACHE_ONLY:
+			break;
+		case CACHED:
+			if (cacheSuccessful)
+				break;
+		case BOTH:
+		case FRESH_ONLY:
+			requestSurvey(id, callback);
+		}
+
+	}
+
+	private void requestSurvey(final String id,
 			final RepositoryCallback<Survey> callback) {
 		new Thread(new Runnable() {
 			@Override
@@ -58,6 +76,7 @@ public class SurveyRepository {
 
 					final JSONObject data = new JSONObject(json.toString());
 					final Survey survey = new Survey(data);
+					cache.put(survey.getId(), survey);
 
 					new Handler(Looper.getMainLooper()).post(new Runnable() {
 						@Override
@@ -107,21 +126,14 @@ public class SurveyRepository {
 					item.put("userId", getAndroidId());
 					data.put("data", item);
 
-					DefaultHttpClient httpclient = new DefaultHttpClient();
-					HttpPost httpPost = new HttpPost(url.toString());
-					StringEntity jsonEntity = new StringEntity(data.toString());
-					httpPost.setEntity(jsonEntity);
-
-					httpPost.setHeader("Accept", "application/json");
-					httpPost.setHeader("Content-type", "application/json");
+					// Get response before the rating is saved to the DB, so if
+					// it fails, the user will be able to rate again.
+					final String response = https.post(url, data.toString());
 
 					DatabaseConnector.getInstance().open();
 					Rating rating = new Rating(surveyId, itemId);
 					DatabaseConnector.getInstance().createRating(rating);
 					DatabaseConnector.getInstance().close();
-
-					final String response = httpclient.execute(httpPost,
-							new BasicResponseHandler());
 
 					new Handler(Looper.getMainLooper()).post(new Runnable() {
 						@Override
@@ -149,6 +161,26 @@ public class SurveyRepository {
 		public void onReceived(E entity);
 
 		public void onError(Exception e);
+	}
+
+	public enum CallbackMode {
+		/** Only display data from the server */
+		FRESH_ONLY,
+		/**
+		 * Only display cached data. If the object isn't in the cache, ignore
+		 * the call
+		 */
+		CACHE_ONLY,
+		/**
+		 * Only display cached data if it is available. Otherwise, load from
+		 * server
+		 */
+		CACHED,
+		/**
+		 * Call with cached data if possible. Call again when fresh data is
+		 * available.
+		 */
+		BOTH;
 	}
 
 	public static SurveyRepository getInstance() {

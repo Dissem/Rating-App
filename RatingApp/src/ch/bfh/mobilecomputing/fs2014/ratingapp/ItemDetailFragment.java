@@ -15,6 +15,7 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Rating;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.CallbackMode;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.RepositoryCallback;
 
 /**
@@ -23,7 +24,7 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.Reposit
  * {@link ItemDetailActivity} on handsets.
  */
 public class ItemDetailFragment extends Fragment {
-	
+
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
@@ -34,7 +35,7 @@ public class ItemDetailFragment extends Fragment {
 	private String surveyId;
 	private int itemId;
 	private Item item;
-	
+
 	private RatingBar ratingBar;
 	private View rootView;
 
@@ -56,68 +57,73 @@ public class ItemDetailFragment extends Fragment {
 		}
 	}
 
+	RepositoryCallback<Survey> surveyRepoCallback = new RepositoryCallback<Survey>() {
+		@Override
+		public void onReceived(Survey entity) {
+			item = entity.getItem(itemId);
+			showItem();
+		}
+
+		@Override
+		public void onError(Exception e) {
+			Utils.showToast(getActivity(), R.string.survey_load_error,
+					Toast.LENGTH_LONG);
+		}
+	};
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.fragment_item_detail,
-				container, false);
+		rootView = inflater.inflate(R.layout.fragment_item_detail, container,
+				false);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
 			// Load the survey and their items via REST-Service
 			SurveyRepository.getInstance().requestSurvey(surveyId,
-					new RepositoryCallback<Survey>() {
-						@Override
-						public void onReceived(Survey entity) {
-							item = entity.getItem(itemId);
-							showItem();
-						}
-
-						@Override
-						public void onError(Exception e) {
-							Utils.showToast(getActivity(),
-									R.string.survey_load_error,
-									Toast.LENGTH_LONG);
-						}
-					});
+					surveyRepoCallback, CallbackMode.CACHED);
 		}
 		return rootView;
 	}
-	
+
 	/**
 	 * OnClickListener which is called when the "Rate"-Button was clicked
 	 */
 	View.OnClickListener rateHandler = new View.OnClickListener() {
-	    public void onClick(final View v) {
-	    	final double rating = (double)ratingBar.getRating();
-	    	
-	    	if (rating == 0) {
-	    		Utils.showToast(getActivity(),
-						R.string.item_rate_zero_error,
+		public void onClick(final View v) {
+			final double rating = (double) ratingBar.getRating();
+
+			if (rating == 0) {
+				Utils.showToast(getActivity(), R.string.item_rate_zero_error,
 						Toast.LENGTH_LONG);
-	    	} else {
-	    		//Write the item rating via. REST-Service
-	    		SurveyRepository.getInstance().writeItemRating(v.getContext(), surveyId, itemId, rating, new RepositoryCallback<String>() {
-					@Override
-					public void onReceived(String response) {
-						//Calculate new Average Rating
-						double oldRating = item.getRating();
-						double newRating = Math.round(((oldRating * item.getVotes()) + rating) /(item.getVotes() + 1)*1000)/1000.0;
-						
-						displayRatingElementsAfterRating(newRating);
-						Utils.showToast(getActivity(),
-								R.string.item_rate_success,
-								Toast.LENGTH_LONG);
-					}
-					@Override
-					public void onError(Exception e) {
-						Utils.showToast(getActivity(),
-								R.string.item_rate_error,
-								Toast.LENGTH_LONG);
-					}
-				});
-	    	}
-	    }
-	  };
+			} else {
+				// Write the item rating via. REST-Service
+				SurveyRepository.getInstance().writeItemRating(v.getContext(),
+						surveyId, itemId, rating,
+						new RepositoryCallback<String>() {
+							@Override
+							public void onReceived(String response) {
+								// Calculate new Average Rating
+								double oldRating = item.getRating();
+								double newRating = Math
+										.round(((oldRating * item.getVotes()) + rating)
+												/ (item.getVotes() + 1) * 1000) / 1000.0;
+
+								displayRatingElementsAfterRating(newRating);
+								Utils.showToast(getActivity(),
+										R.string.item_rate_success,
+										Toast.LENGTH_LONG);
+							}
+
+							@Override
+							public void onError(Exception e) {
+								Utils.showToast(getActivity(),
+										R.string.item_rate_error,
+										Toast.LENGTH_LONG);
+							}
+						});
+			}
+		}
+	};
 
 	private void showItem() {
 		if (item != null) {
@@ -126,28 +132,29 @@ public class ItemDetailFragment extends Fragment {
 			title.setVisibility(View.VISIBLE);
 
 			if (item.getImage() != null) {
-				ImageView image = (ImageView) rootView.findViewById(R.id.item_logo);
-				Utils.setImage(
-						image,
-						item.getImage());
+				ImageView image = (ImageView) rootView
+						.findViewById(R.id.item_logo);
+				Utils.setImage(image, item.getImage());
 				image.setVisibility(View.VISIBLE);
 			}
-			
+
 			if (item.getDescription() != null) {
-				TextView detail = (TextView) rootView.findViewById(R.id.detail_text);
+				TextView detail = (TextView) rootView
+						.findViewById(R.id.detail_text);
 				detail.setText(item.getDescription());
 				detail.setVisibility(View.VISIBLE);
 			}
-			
+
 			ratingBar = (RatingBar) rootView.findViewById(R.id.rating_bar);
-			
-			//If User has rated the item
-			Rating rating = new Rating(surveyId,itemId);
+
+			// If User has rated the item
+			Rating rating = new Rating(surveyId, itemId);
 			DatabaseConnector.getInstance().open();
-			if (DatabaseConnector.getInstance().isRatingExist(rating)){
+			if (DatabaseConnector.getInstance().isRatingExist(rating)) {
 				displayRatingElementsAfterRating(item.getRating());
 			} else {
-				Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
+				Button rateButton = (Button) rootView
+						.findViewById(R.id.rate_button);
 				rateButton.setOnClickListener(rateHandler);
 				rateButton.setVisibility(View.VISIBLE);
 			}
@@ -155,17 +162,19 @@ public class ItemDetailFragment extends Fragment {
 			DatabaseConnector.getInstance().close();
 		}
 	}
-	
+
 	private void displayRatingElementsAfterRating(double rating) {
-		String averageRating = " "+rating;
-		
+		String averageRating = " " + rating;
+
 		Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
 		rateButton.setVisibility(View.INVISIBLE);
-		
-		TextView ratingText = (TextView) rootView.findViewById(R.id.rating_text);
-		ratingText.setText(getString(R.string.text_already_rated) + averageRating);
-		
+
+		TextView ratingText = (TextView) rootView
+				.findViewById(R.id.rating_text);
+		ratingText.setText(getString(R.string.text_already_rated)
+				+ averageRating);
+
 		ratingBar.setEnabled(false);
-		ratingBar.setRating((float)rating);
+		ratingBar.setRating((float) rating);
 	}
 }

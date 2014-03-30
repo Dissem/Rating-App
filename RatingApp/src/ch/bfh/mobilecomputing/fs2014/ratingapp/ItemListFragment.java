@@ -12,6 +12,7 @@ import android.widget.Toast;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.CallbackMode;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository.RepositoryCallback;
 
 /**
@@ -81,33 +82,36 @@ public class ItemListFragment extends ListFragment {
 
 		surveyId = surveyRepo.getSurveyId();
 
-		surveyRepo.requestSurvey(surveyId, new RepositoryCallback<Survey>() {
-			@Override
-			public void onReceived(Survey entity) {
-				survey = entity;
-				try {
-					ListView listView = getListView();
-					LayoutInflater inflater = getLayoutInflater(null);
-
-					ViewGroup header = (ViewGroup) inflater.inflate(
-							R.layout.list_header, listView, false);
-					listView.addHeaderView(header, entity.getTitle(), false);
-				} catch (IllegalStateException e) {
-					Log.e(getClass().getSimpleName(), e.getMessage());
-					// TODO: Is there something to do in this case?
-				}
-
-				setListAdapter(new ItemAdapter(getActivity(),
-						android.R.id.text1, entity.getItems()));
-			}
-
-			@Override
-			public void onError(Exception e) {
-				Utils.showToast(getActivity(), R.string.survey_load_error,
-						Toast.LENGTH_LONG);
-			}
-		});
+		surveyRepo.requestSurvey(surveyId, surveyRepoCallback,
+				CallbackMode.CACHED);
 	}
+
+	RepositoryCallback<Survey> surveyRepoCallback = new RepositoryCallback<Survey>() {
+		@Override
+		public void onReceived(Survey entity) {
+			survey = entity;
+			try {
+				ListView listView = getListView();
+				LayoutInflater inflater = getLayoutInflater(null);
+
+				ViewGroup header = (ViewGroup) inflater.inflate(
+						R.layout.list_header, listView, false);
+				listView.addHeaderView(header, entity.getTitle(), false);
+			} catch (IllegalStateException e) {
+				Log.e(getClass().getSimpleName(), e.getMessage());
+				// TODO: Is there something to do in this case?
+			}
+
+			setListAdapter(new ItemAdapter(getActivity(), android.R.id.text1,
+					entity.getItems()));
+		}
+
+		@Override
+		public void onError(Exception e) {
+			Utils.showToast(getActivity(), R.string.survey_load_error,
+					Toast.LENGTH_LONG);
+		}
+	};
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
