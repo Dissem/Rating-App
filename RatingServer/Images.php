@@ -24,14 +24,14 @@ class Images
      */
 	function post($request_data = NULL) {
 		if (!isset($request_data['fileUpload']))
-			throw new RestException(400, "The field fileUpload doesn't exist, there's something wrong with the sent data.");
+			throw new RestException(400, "The field 'fileUpload' doesn't exist, there's something wrong with the sent data.");
 
 		$image = $request_data['fileUpload'];
 
 		$name = uniqid();
 
 		if (!move_uploaded_file($image['tmp_name'], "data/$name"))
-			throw new RestException(500, "There was a problem with the uploaded file, please try again.");
+			throw new RestException(500, "There was a problem with the uploaded file, or with uploading the file. There might be something wrong with the server. Does the filder 'data' have the correct permissions?");
 
 		return array("name" => $name);
 	}
