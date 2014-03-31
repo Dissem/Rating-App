@@ -15,8 +15,11 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 
 public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 
+	private static int rankNr;
+	
 	public ItemAdapter(Context context, int resource, List<Survey.Item> projects) {
 		super(context, resource, projects);
+		ItemAdapter.rankNr = 0;
 	}
 
 	@Override
@@ -42,7 +45,8 @@ public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 			if (!DatabaseConnector.getInstance().isRatingExist(internalRating)) {
 				rank.setText("#");
 			} else {
-				rank.setText("#");
+				ItemAdapter.rankNr++;
+				rank.setText(String.valueOf(ItemAdapter.rankNr) + ".");
 			}
 		}
 

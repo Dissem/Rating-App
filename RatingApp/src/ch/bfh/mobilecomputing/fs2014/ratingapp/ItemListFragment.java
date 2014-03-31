@@ -1,6 +1,9 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,11 +11,11 @@ import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.DatabaseConnector;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Rating;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey.Item;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
@@ -93,7 +96,9 @@ public class ItemListFragment extends ListFragment {
 	RepositoryCallback<Survey> surveyRepoCallback = new RepositoryCallback<Survey>() {
 		@Override
 		public void onReceived(Survey entity) {
+			DatabaseConnector.getInstance().open();
 			survey = entity;
+			survey.setItems(getSortedData(survey));
 			try {
 				ListView listView = getListView();
 				LayoutInflater inflater = getLayoutInflater(null);
@@ -104,10 +109,9 @@ public class ItemListFragment extends ListFragment {
 				// TODO: Is there something to do in this case?
 			}
 
-			DatabaseConnector.getInstance().open();
-			Collections.sort(entity.getItems());
+			
 			setListAdapter(new ItemAdapter(getActivity(), android.R.id.text1,
-					entity.getItems()));
+					survey.getItems()));
 		}
 
 		@Override
@@ -122,7 +126,7 @@ public class ItemListFragment extends ListFragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		setActivateOnItemClick(true);
-		
+
 		// Restore the previously serialized activated item position.
 		if (savedInstanceState != null
 				&& savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
@@ -193,11 +197,63 @@ public class ItemListFragment extends ListFragment {
 
 		mActivatedPosition = position;
 	}
-	
-	private void initListHeader(ListView listView, LayoutInflater inflater, Survey survey) {
+
+	private void initListHeader(ListView listView, LayoutInflater inflater,
+			Survey survey) {
 		View header = inflater.inflate(R.layout.list_header, listView, false);
 		TextView txtHeader = (TextView) header.findViewById(R.id.txtListHeader);
 		txtHeader.setText(survey.getTitle());
 		listView.addHeaderView(header);
+	}
+
+	private List<Item> getSortedData(Survey survey) {
+		List<Item> itemsRated = new ArrayList<Item>();
+		List<Item> itemsNotRated = new ArrayList<Item>();
+		Rating internalRating = null;
+
+		for (Item item : survey.getItems()) {
+			internalRating = new Rating(item.getSurveyId(), item.getId());
+			if (DatabaseConnector.getInstance().isRatingExist(internalRating)) {
+				itemsRated.add(item);
+			} else {
+				itemsNotRated.add(item);
+			}
+		}
+		return sortMergeData(itemsRated, itemsNotRated);
+	}
+	
+	private List<Item> sortMergeData(List<Item> itemsRated, List<Item> itemsNotRated) {
+		List<Item> mergedList = new ArrayList<Item>();
+		
+		Collections.sort(itemsRated, new Comparator<Item>() {
+			@Override
+			public int compare(Item item1, Item item2) {
+				if (item1.getRating() > item2.getRating()) {
+					return -1;
+				} else if (item1.getRating() == item2.getRating()) {
+					if (item1.getVotes() < item2.getVotes()) {
+						return -1;
+					} else {
+						return 0;
+					}
+				}
+				return 1;
+			}
+		});
+
+		Collections.sort(itemsNotRated, new Comparator<Item>() {
+			@Override
+			public int compare(Item item1, Item item2) {
+				return item1.getTitle().compareTo(item2.getTitle());
+			}
+		});
+		
+		System.out.println(itemsRated);
+		System.out.println(itemsNotRated);
+		
+		mergedList.addAll(itemsNotRated);
+		mergedList.addAll(itemsRated);
+		
+		return mergedList;
 	}
 }

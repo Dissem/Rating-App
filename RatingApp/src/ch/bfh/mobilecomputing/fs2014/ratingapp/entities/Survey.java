@@ -64,6 +64,10 @@ public class Survey {
 	public List<Item> getItems() {
 		return items;
 	}
+	
+	public void setItems(List<Item> items) {
+		this.items = items;
+	}
 
 	/**
 	 * A dummy item representing a piece of content.
