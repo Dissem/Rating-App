@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.DatabaseConnector;
@@ -14,12 +15,9 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Rating;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.Survey;
 
 public class ItemAdapter extends ArrayAdapter<Survey.Item> {
-
-	private static int rankNr;
 	
 	public ItemAdapter(Context context, int resource, List<Survey.Item> items) {
 		super(context, resource, items);
-		ItemAdapter.rankNr = 0;
 	}
 
 	@Override
@@ -34,6 +32,7 @@ public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 		Survey.Item item = getItem(position);
 		Rating internalRating = new Rating(item.getSurveyId(), item.getId());
 
+		ImageView medal = (ImageView) row.findViewById(R.id.imgMedal);
 		TextView rank = (TextView) row.findViewById(R.id.txtRank);
 		TextView title = (TextView) row.findViewById(R.id.txtTitle);
 		TextView subtitle = (TextView) row.findViewById(R.id.txtSubtitle);
@@ -44,9 +43,24 @@ public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 		if (rank != null) {
 			if (!DatabaseConnector.getInstance().isRatingExist(internalRating)) {
 				rank.setText("#");
+				
+				medal.setVisibility(ImageView.GONE);
 			} else {
-				ItemAdapter.rankNr++;
-				rank.setText(String.valueOf(item.getRank()) + ".");
+				rank.setVisibility(TextView.GONE);
+				medal.setVisibility(ImageView.VISIBLE);
+				
+				int rankNr = item.getRank();
+				
+				if (rankNr == 1) {					
+					medal.setImageResource(R.drawable.medal_gold);
+				} else if (rankNr == 2) {
+					medal.setImageResource(R.drawable.medal_silver);					
+				} else if (rankNr == 3) {
+					medal.setImageResource(R.drawable.medal_bronze);					
+				} else {
+					rank.setVisibility(TextView.VISIBLE);
+					rank.setText(item.getRank() + ".");
+				}
 			}
 		}
 
