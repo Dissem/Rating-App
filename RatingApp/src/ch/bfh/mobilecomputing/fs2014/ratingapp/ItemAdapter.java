@@ -17,8 +17,8 @@ public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 
 	private static int rankNr;
 	
-	public ItemAdapter(Context context, int resource, List<Survey.Item> projects) {
-		super(context, resource, projects);
+	public ItemAdapter(Context context, int resource, List<Survey.Item> items) {
+		super(context, resource, items);
 		ItemAdapter.rankNr = 0;
 	}
 
@@ -46,7 +46,7 @@ public class ItemAdapter extends ArrayAdapter<Survey.Item> {
 				rank.setText("#");
 			} else {
 				ItemAdapter.rankNr++;
-				rank.setText(String.valueOf(ItemAdapter.rankNr) + ".");
+				rank.setText(String.valueOf(item.getRank()) + ".");
 			}
 		}
 

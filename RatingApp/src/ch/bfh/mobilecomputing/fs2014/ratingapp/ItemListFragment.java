@@ -109,7 +109,6 @@ public class ItemListFragment extends ListFragment {
 				// TODO: Is there something to do in this case?
 			}
 
-			
 			setListAdapter(new ItemAdapter(getActivity(), android.R.id.text1,
 					survey.getItems()));
 		}
@@ -221,10 +220,11 @@ public class ItemListFragment extends ListFragment {
 		}
 		return sortMergeData(itemsRated, itemsNotRated);
 	}
-	
-	private List<Item> sortMergeData(List<Item> itemsRated, List<Item> itemsNotRated) {
+
+	private List<Item> sortMergeData(List<Item> itemsRated,
+			List<Item> itemsNotRated) {
 		List<Item> mergedList = new ArrayList<Item>();
-		
+
 		Collections.sort(itemsRated, new Comparator<Item>() {
 			@Override
 			public int compare(Item item1, Item item2) {
@@ -233,6 +233,8 @@ public class ItemListFragment extends ListFragment {
 				} else if (item1.getRating() == item2.getRating()) {
 					if (item1.getVotes() < item2.getVotes()) {
 						return -1;
+					} else if (item1.getVotes() > item2.getVotes()) {
+						return 1;
 					} else {
 						return 0;
 					}
@@ -247,13 +249,37 @@ public class ItemListFragment extends ListFragment {
 				return item1.getTitle().compareTo(item2.getTitle());
 			}
 		});
-		
-		System.out.println(itemsRated);
-		System.out.println(itemsNotRated);
-		
+
+		itemsRated = addRanksToItems(itemsRated);
+
 		mergedList.addAll(itemsNotRated);
 		mergedList.addAll(itemsRated);
-		
+
 		return mergedList;
+	}
+
+	private List<Item> addRanksToItems(List<Item> itemsRated) {
+		int rank = 0;
+		int offset = 0;
+		double prevRating = 0.0;
+		int prevVotes = 0;
+
+		for (Item item : itemsRated) {
+			if (item.getRating() != prevRating) {
+				rank += (1 + offset);
+				offset = 0;
+			} else {
+				if (item.getVotes() < prevVotes) {
+					rank += (1 + offset);
+					offset = 0;
+				} else {
+					offset++;
+				}
+			}
+			prevRating = item.getRating();
+			prevVotes = item.getVotes();
+			item.setRank(rank);
+		}
+		return itemsRated;
 	}
 }

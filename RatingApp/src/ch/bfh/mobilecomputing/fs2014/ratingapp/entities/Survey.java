@@ -72,7 +72,7 @@ public class Survey {
 	/**
 	 * A dummy item representing a piece of content.
 	 */
-	public class Item implements Comparable<Survey.Item> {
+	public class Item {
 		private int id;
 		private String title;
 		private String subtitle;
@@ -80,6 +80,7 @@ public class Survey {
 		private Uri image;
 		private double rating;
 		private int votes;
+		private int rank;
 
 		private Item(JSONObject itemData) {
 			id = num(itemData, "itemId");
@@ -89,6 +90,7 @@ public class Survey {
 			image = uri(itemData, "imageUrl");
 			rating = dec(itemData, "rating");
 			votes = num(itemData, "votes");
+			rank = 0;
 		}
 
 		public int getId() {
@@ -123,26 +125,19 @@ public class Survey {
 			return votes;
 		}
 
+		public int getRank() {
+			return rank;
+		}
+
+		public void setRank(int rank) {
+			this.rank = rank;
+		}
+
 		@Override
 		public String toString() {
 			return Survey.this.id + "/" + id + ": " + title + " (" + rating
 					+ ")";
 		}
-
-		@Override
-		public int compareTo(Item another) {
-			if (this.rating > another.getRating()) {
-				return -1;
-			} else if (this.rating == another.getRating()) {
-				if (this.votes < another.getRating()) {
-					return -1;
-				} else {
-					return 0;					
-				}
-			}
-			return 1;
-		}		
-		
 	}
 
 	private static String str(JSONObject data, String field) {
