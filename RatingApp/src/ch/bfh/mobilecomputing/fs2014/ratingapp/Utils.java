@@ -12,16 +12,20 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class Utils {
 	private static Map<Uri, Bitmap> IMAGE_MAP = new HashMap<Uri, Bitmap>();
 
-	public static void setImage(final ImageView view, final Uri uri) {
+	public static void setImage(final ImageView view, final ProgressBar progressbar, final Uri uri) {
 
 		if (IMAGE_MAP.containsKey(uri)) {
 			view.setImageBitmap(IMAGE_MAP.get(uri));
+			view.setVisibility(View.VISIBLE);
+			progressbar.setVisibility(View.GONE);
 		} else {
 			new Thread(new Runnable() {
 				@Override
@@ -37,12 +41,22 @@ public class Utils {
 									@Override
 									public void run() {
 										view.setImageBitmap(bm);
+										view.setVisibility(View.VISIBLE);
+										progressbar.setVisibility(View.GONE);
 									}
 								});
 					} catch (Exception e) {
 						e.printStackTrace();
 						showToast(ctx, R.string.image_load_error,
 								Toast.LENGTH_SHORT);
+						new Handler(Looper.getMainLooper())
+						.post(new Runnable() {
+							@Override
+							public void run() {
+								view.setVisibility(View.VISIBLE);
+								progressbar.setVisibility(View.GONE);
+							}
+						});
 					}
 				}
 			}).start();

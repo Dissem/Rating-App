@@ -25,11 +25,24 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/title"
         android:layout_centerHorizontal="false"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_launcher"
+        android:layout_margin="10dp"
+        android:src="@drawable/noimage"
         android:visibility="invisible"
         tools:ignore="ContentDescription" />
-
+    
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="8dp"
+        android:maxHeight="30dp"
+        android:maxWidth="30dp"
+        android:minHeight="30dip"
+        android:minWidth="30dip" />
+    
     <RatingBar
         android:id="@+id/rating_bar"
         android:layout_width="wrap_content"
@@ -66,7 +79,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/item_logo"
         android:layout_gravity="left"
-        android:layout_margin="8dp"
+        android:layout_margin="9dp"
         android:text="Detail description"
         android:visibility="invisible"
         tools:ignore="HardcodedText" />

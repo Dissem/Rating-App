@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -108,7 +109,7 @@ public class ItemDetailFragment extends Fragment {
 										.round(((oldRating * item.getVotes()) + rating)
 												/ (item.getVotes() + 1) * 1000) / 1000.0;
 
-								displayRatingElementsAfterRating(newRating);
+								displayRatingElementsAfterRating(newRating, item.getVotes() + 1);
 								Utils.showToast(getActivity(),
 										R.string.item_rate_success,
 										Toast.LENGTH_LONG);
@@ -134,8 +135,9 @@ public class ItemDetailFragment extends Fragment {
 			if (item.getImage() != null) {
 				ImageView image = (ImageView) rootView
 						.findViewById(R.id.item_logo);
-				Utils.setImage(image, item.getImage());
-				image.setVisibility(View.VISIBLE);
+				ProgressBar loadImage = (ProgressBar) rootView.findViewById(R.id.progress_bar);
+				
+				Utils.setImage(image, loadImage, item.getImage());
 			}
 
 			if (item.getDescription() != null) {
@@ -151,7 +153,7 @@ public class ItemDetailFragment extends Fragment {
 			Rating rating = new Rating(surveyId, itemId);
 			DatabaseConnector.getInstance().open();
 			if (DatabaseConnector.getInstance().isRatingExist(rating)) {
-				displayRatingElementsAfterRating(item.getRating());
+				displayRatingElementsAfterRating(item.getRating(), item.getVotes());
 			} else {
 				Button rateButton = (Button) rootView
 						.findViewById(R.id.rate_button);
@@ -163,7 +165,7 @@ public class ItemDetailFragment extends Fragment {
 		}
 	}
 
-	private void displayRatingElementsAfterRating(double rating) {
+	private void displayRatingElementsAfterRating(double rating, int votes) {
 		String averageRating = " " + rating;
 
 		Button rateButton = (Button) rootView.findViewById(R.id.rate_button);
@@ -171,8 +173,16 @@ public class ItemDetailFragment extends Fragment {
 
 		TextView ratingText = (TextView) rootView
 				.findViewById(R.id.rating_text);
+		
+		String votesText = "";
+		if (votes == 1) {
+			votesText = " (" + votes + " " + getString(R.string.vote)+")";
+		} else {
+			votesText = " (" + votes + " " + getString(R.string.votes)+")";
+		}
+		
 		ratingText.setText(getString(R.string.text_already_rated)
-				+ averageRating);
+				+ averageRating + votesText);
 
 		ratingBar.setEnabled(false);
 		ratingBar.setRating((float) rating);

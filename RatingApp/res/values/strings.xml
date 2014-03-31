@@ -18,6 +18,8 @@
     <string name="item_rate_success">Item successfully rated</string>
     <string name="text_already_rated">You have already rated this item. \nAverage Rating: </string>
     <string name="text_not_yet_rated">not yet rated</string>
+    <string name="vote">vote</string>
+    <string name="votes">votes</string>
     <string name="reload">Reload</string>
     <string name="img_medal_desc">medal icon</string>
 </resources>
