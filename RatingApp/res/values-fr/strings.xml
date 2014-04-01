@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Appli d\'évaluation</string>
+    <string name="title_item_detail">Détail de l\'article</string>
+    <string name="image_load_error">Impossible d\'obtenir l\'image</string>
+    <string name="survey_load_error">Impossible d\'obtenir l\'enquête</string>
+    <string name="scan_code">Scanner un code</string>
+    <string name="enter_code">Entrer le code</string>
+    <string name="survey">Enquête</string>
+    <string name="survey_code">Code d\'enquête</string>
+    <string name="start_survey">Commencer l\'enquête</string>
+    <string name="drawer_open">Ouvrir le tiroir de navigation</string>
+    <string name="drawer_close">Fermer navigation tiroir</string>
+    <string name="rate_item">Évaluer</string>
+    <string name="item_rate_zero_error">S\'il vous plaît sélectionnez les étoiles</string>
+    <string name="item_rate_error">Impossible de noter l\'article</string>
+    <string name="item_rate_success">Article évalué avec succès</string>
+    <string name="text_already_rated">Vous avez déjà evalué cet article. \nNote moyenne: </string>
+    <string name="text_not_yet_rated">not yet rated</string>
+    <string name="vote">Note</string>
+    <string name="votes">Notes</string>
+    <string name="reload">Recharger</string>
+    <string name="img_medal_desc">Medaille icône</string>
+</resources>
