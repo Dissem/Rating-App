@@ -11,6 +11,7 @@ import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -103,7 +104,7 @@ public class ItemListFragment extends ListFragment {
 				ListView listView = getListView();
 				LayoutInflater inflater = getLayoutInflater(null);
 
-				initListHeader(listView, inflater, survey);
+				initListHeader(listView, inflater);
 			} catch (IllegalStateException e) {
 				Log.e(getClass().getSimpleName(), e.getMessage());
 				// TODO: Is there something to do in this case?
@@ -197,12 +198,16 @@ public class ItemListFragment extends ListFragment {
 		mActivatedPosition = position;
 	}
 
-	private void initListHeader(ListView listView, LayoutInflater inflater,
-			Survey survey) {
-		View header = inflater.inflate(R.layout.list_header, listView, false);
-		TextView txtHeader = (TextView) header.findViewById(R.id.txtListHeader);
-		txtHeader.setText(survey.getTitle());
-		listView.addHeaderView(header);
+	private void initListHeader(ListView listView, LayoutInflater inflater) {
+		if (listView.getHeaderViewsCount() == 0) {
+			ViewGroup header = (ViewGroup) inflater.inflate(
+					R.layout.list_header, listView, false);
+			listView.addHeaderView(header, null, false);
+
+			TextView txtHeader = (TextView) header
+					.findViewById(R.id.txtListHeader);
+			txtHeader.setText(survey.getTitle());
+		}
 	}
 
 	private List<Item> getSortedData(Survey survey) {
