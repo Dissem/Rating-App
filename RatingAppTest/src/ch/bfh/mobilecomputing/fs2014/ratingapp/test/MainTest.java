@@ -1,13 +1,17 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp.test;
 
+import android.annotation.SuppressLint;
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.Button;
 import android.widget.TextView;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.MainActivity;
 import ch.bfh.mobilecomputing.fs2014.ratingapp.R;
 
+@SuppressLint("NewApi")
 public class MainTest extends ActivityInstrumentationTestCase2<MainActivity> {
 	private MainActivity activity;
 	private TextView codeText;
+	private Button startBtn;
 
 	public MainTest() {
 		super(MainActivity.class);
@@ -37,25 +41,35 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity> {
 		// Get references to objects in the application under test. These are
 		// tested to ensure that the app under test has initialized correctly.
 		codeText = (TextView) activity.findViewById(R.id.code_text);
+		startBtn = (Button) activity.findViewById(R.id.start_survey_button);
 	}
 
 	/**
 	 * Tests the initial values of key objects in the app under test, to ensure
 	 * the initial conditions make sense. If one of these is not initialized
 	 * correctly, then subsequent tests are suspect and should be ignored.
+	 * 
+	 * @throws InterruptedException
 	 */
-	public void testPreconditions() {
+	public void testPreconditions() throws InterruptedException {
 		// assert that codeText exists and therefor the app shows the
 		// "enter code" page
 		assertNotNull(codeText);
+		activity.runOnUiThread(new Runnable() {
+			public void run() {
+				codeText.requestFocus();
+			}
+		});
+		sendKeys("T E S T");
 
-		// Test that the spinner's backing mLocalAdapter was initialized
-		// correctly.
-		// assertTrue(mPlanetData != null);
+		assertNotNull(startBtn);
+		activity.runOnUiThread(new Runnable() {
+			public void run() {
+				startBtn.callOnClick();
+			}
+		});
 
-		// Also ensure that the backing mLocalAdapter has the correct number of
-		// entries.
-		// assertEquals(mPlanetData.getCount(), ADAPTER_COUNT);
+		assertEquals("test", codeText.getText().toString());
 	}
 
 }
