@@ -1,6 +1,10 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp.test;
 
 import android.annotation.SuppressLint;
+import android.app.Instrumentation;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.Button;
 import android.widget.TextView;
@@ -30,6 +34,11 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity> {
 		// prepare to send key events to the app under test by turning off touch
 		// mode. Must be done before the first call to getActivity()
 		setActivityInitialTouchMode(false);
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(getInstrumentation()
+						.getTargetContext());
+		settings.edit().clear().commit();
 
 		// Start the app under test by starting its main activity. The test
 		// runner already knows which activity this is from the call to the

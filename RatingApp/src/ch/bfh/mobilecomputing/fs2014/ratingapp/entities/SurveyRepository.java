@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 
 public class SurveyRepository {
@@ -29,7 +30,7 @@ public class SurveyRepository {
 	private static Map<String, Survey> cache = new HashMap<String, Survey>();
 
 	private SurveyRepository(Activity activity) {
-		sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+		sharedPref = PreferenceManager.getDefaultSharedPreferences(activity);
 		contentResolver = activity.getContentResolver();
 		https = new CACertHttpsHelper(activity);
 	}
