@@ -1,8 +1,6 @@
 package ch.bfh.mobilecomputing.fs2014.ratingapp.test;
 
 import android.annotation.SuppressLint;
-import android.app.Instrumentation;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.test.ActivityInstrumentationTestCase2;

@@ -105,13 +105,14 @@ public class ItemListFragment extends ListFragment {
 				LayoutInflater inflater = getLayoutInflater(null);
 
 				initListHeader(listView, inflater);
-			} catch (IllegalStateException e) {
+				setListAdapter(new ItemAdapter(getActivity(),
+						android.R.id.text1, survey.getItems()));
+			} catch (Exception e) {
+				// It's possible that we're too late, e.g. the activity is
+				// already destroyed when the callback is called. Let's just
+				// log and ignore this case:
 				Log.e(getClass().getSimpleName(), e.getMessage());
-				// TODO: Is there something to do in this case?
 			}
-
-			setListAdapter(new ItemAdapter(getActivity(), android.R.id.text1,
-					survey.getItems()));
 		}
 
 		@Override
