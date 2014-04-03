@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -18,6 +21,12 @@ import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.SurveyRepository;
 public class EnterCodeFragment extends Fragment {
 	private final SurveyRepository surveyRepo = SurveyRepository.getInstance();
 	private TextView codeText;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,39 +42,46 @@ public class EnterCodeFragment extends Fragment {
 		startButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				String surveyId = codeText.getText().toString();
 				if (!surveyId.isEmpty()) {
 					surveyRepo.setSurveyId(surveyId);
 					InputMethodManager imm = (InputMethodManager) getActivity()
 							.getSystemService(Context.INPUT_METHOD_SERVICE);
 					imm.hideSoftInputFromWindow(codeText.getWindowToken(), 0);
-					((MainActivity) getActivity()).selectItem(MainActivity.SURVEY_POSITION);
-				}
-			}
-		});
-
-		final Button scanButton = (Button) rootView
-				.findViewById(R.id.scan_code_button);
-		scanButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				try {
-					Intent intent = new Intent(
-							"com.google.zxing.client.android.SCAN");
-					intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-					startActivityForResult(intent, 0);
-				} catch (Exception e) {
-					Uri marketUri = Uri
-							.parse("market://details?id=com.google.zxing.client.android");
-					Intent marketIntent = new Intent(Intent.ACTION_VIEW,
-							marketUri);
-					startActivity(marketIntent);
+					((MainActivity) getActivity())
+							.selectItem(MainActivity.SURVEY_POSITION);
 				}
 			}
 		});
 
 		return rootView;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.menu_enter_code, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_scan_code:
+			try {
+				Intent intent = new Intent(
+						"com.google.zxing.client.android.SCAN");
+				intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+				startActivityForResult(intent, 0);
+			} catch (Exception e) {
+				Uri marketUri = Uri
+						.parse("market://details?id=com.google.zxing.client.android");
+				Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+				startActivity(marketIntent);
+			}
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override

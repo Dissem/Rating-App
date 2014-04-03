@@ -28,12 +28,4 @@
         android:layout_below="@+id/code_text"
         android:text="@string/start_survey" />
 
-    <Button
-        android:id="@+id/scan_code_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/start_survey_button"
-        android:layout_alignParentBottom="true"
-        android:text="@string/scan_code" />
-
 </RelativeLayout>
