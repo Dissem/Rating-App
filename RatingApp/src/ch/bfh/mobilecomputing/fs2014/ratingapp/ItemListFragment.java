@@ -237,7 +237,7 @@ public class ItemListFragment extends ListFragment {
 				if (item1.getRating() > item2.getRating()) {
 					return -1;
 				} else if (item1.getRating() == item2.getRating()) {
-					if (item1.getVotes() < item2.getVotes()) {
+					if (item1.getVotes() > item2.getVotes()) {
 						return -1;
 					} else if (item1.getVotes() > item2.getVotes()) {
 						return 1;
