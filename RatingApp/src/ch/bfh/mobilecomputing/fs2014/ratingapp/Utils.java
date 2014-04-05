@@ -4,23 +4,24 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.CACertHttpsHelper;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import ch.bfh.mobilecomputing.fs2014.ratingapp.entities.CACertHttpsHelper;
 
 public class Utils {
 	private static Map<Uri, Bitmap> IMAGE_MAP = new HashMap<Uri, Bitmap>();
 
-	public static void setImage(final ImageView view, final ProgressBar progressbar, final Uri uri) {
+	public static void setImage(final ImageView view,
+			final ProgressBar progressbar, final Uri uri) {
 
 		if (IMAGE_MAP.containsKey(uri)) {
 			view.setImageBitmap(IMAGE_MAP.get(uri));
@@ -50,13 +51,13 @@ public class Utils {
 						showToast(ctx, R.string.image_load_error,
 								Toast.LENGTH_SHORT);
 						new Handler(Looper.getMainLooper())
-						.post(new Runnable() {
-							@Override
-							public void run() {
-								view.setVisibility(View.VISIBLE);
-								progressbar.setVisibility(View.GONE);
-							}
-						});
+								.post(new Runnable() {
+									@Override
+									public void run() {
+										view.setVisibility(View.VISIBLE);
+										progressbar.setVisibility(View.GONE);
+									}
+								});
 					}
 				}
 			}).start();
@@ -65,11 +66,19 @@ public class Utils {
 
 	public static void showToast(final Context context, final int message,
 			final int duration) {
+		if (context == null) {
+			Log.d("Utils", "context was null, toast isn't created");
+			return;
+		}
 		showToast(context, context.getResources().getString(message), duration);
 	}
 
 	public static void showToast(final Context context,
 			final CharSequence message, final int duration) {
+		if (context == null) {
+			Log.d("Utils", "context was null, toast isn't created");
+			return;
+		}
 		if (Thread.currentThread() == context.getMainLooper().getThread()) {
 			Toast.makeText(context, message, duration).show();
 		} else {
